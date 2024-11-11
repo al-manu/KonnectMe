@@ -27,7 +27,6 @@ jobs:
     # Create the S3 Bucket for Terraform state (if it doesn't exist)
       - name: Create S3 bucket for Terraform state
         run: |
-            aws s3api head-bucket --bucket KDW-terraform-state || \
             aws s3api create-bucket --bucket KDW-terraform-state --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
 
     # Enable versioning on the S3 bucket (optional but recommended for Terraform state)
