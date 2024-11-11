@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "state_backend" {
-  bucket = "my-terraform-state-bucket"    # The S3 bucket name for state and lock
+  bucket = "Kstat_terrafrom"    # The S3 bucket name for state and lock
   # region = "eu-central-1"                  # AWS region
 
   versioning {
