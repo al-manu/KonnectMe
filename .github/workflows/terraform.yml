@@ -74,7 +74,9 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}  # Use the branch name for environment (dev, sit, prod)
-    
+    permissions:
+        id-token: write  # Required for OIDC role assumption
+        contents: read   # Required for checking out the code
     steps:
       # Checkout repository
       - name: Checkout code
