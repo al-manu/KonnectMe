@@ -27,20 +27,20 @@ jobs:
     # Create the S3 Bucket for Terraform state (if it doesn't exist)
       - name: Create S3 bucket for Terraform state
         run: |
-            aws s3api head-bucket --bucket my-terraform-state-bucket || \
-            aws s3api create-bucket --bucket my-terraform-state-bucket --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
+            aws s3api head-bucket --bucket KDW-terraform-state || \
+            aws s3api create-bucket --bucket KDW-terraform-state --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
 
     # Enable versioning on the S3 bucket (optional but recommended for Terraform state)
       - name: Enable versioning on S3 bucket
         run: |
-            aws s3api put-bucket-versioning --bucket my-terraform-state-bucket --versioning-configuration Status=Enabled --region eu-central-1
+            aws s3api put-bucket-versioning --bucket KDW-terraform-state --versioning-configuration Status=Enabled --region eu-central-1
 
         # Set up Terraform backend configuration for S3
       - name: Configure Terraform backend
         run: |
             echo 'terraform {' > backend.tf
             echo '  backend "s3" {' >> backend.tf
-            echo '    bucket = "my-terraform-state-bucket"' >> backend.tf
+            echo '    bucket = "KDW-terraform-state"' >> backend.tf
             echo '    key    = "path/to/state/file"' >> backend.tf
             echo '    region = "eu-central-1"' >> backend.tf
             echo '  }' >> backend.tf
