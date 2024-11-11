@@ -24,7 +24,10 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
-
+   
+      - name: Terraform Init
+        run: |
+           terraform init
         
       - name: Terraform Botting
         run: |
