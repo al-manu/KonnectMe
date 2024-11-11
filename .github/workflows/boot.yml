@@ -1,73 +1,73 @@
-name: Bootstrap AWS Resources (State and Lock S3 Buckets)
+# name: Bootstrap AWS Resources (State and Lock S3 Buckets)
 
-on:
-  push:
-    branches:
-      - main  # Trigger on push to the main branch
+# on:
+#   push:
+#     branches:
+#       - main  # Trigger on push to the main branch
 
-jobs:
-  create-resources:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write  # Required for OIDC role assumption
-      contents: read   # Required for checking out the code
+# jobs:
+#   create-resources:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       id-token: write  # Required for OIDC role assumption
+#       contents: read   # Required for checking out the code
     
-    environment:
-        name: dev  # This can be dynamically set based on your environment
+#     environment:
+#         name: dev  # This can be dynamically set based on your environment
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
 
-      - name: Set up AWS OIDC credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+#       - name: Set up AWS OIDC credentials
+#         uses: aws-actions/configure-aws-credentials@v3
+#         with:
+#           role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
+#           aws-region: ${{ secrets.AWS_REGION }}
    
-      - name: Terraform Init
-        run: |
-            terraform init
+#       - name: Terraform Init
+#         run: |
+#             terraform init
         
-      - name: Terraform Botting
-        run: |
-            terraform apply -target=aws_s3_bucket.state_backend
+#       - name: Terraform Botting
+#         run: |
+#             terraform apply -target=aws_s3_bucket.state_backend
 
-    #   - name: Check for Terraform lock file in S3
-    #     run: |
-    #       LOCKFILE="terraform.lock"
-    #       S3_BUCKET="my-terraform-state-bucket"
-    #       S3_PATH="path/to/$LOCKFILE"  # Specify the path for the lock file
+#     #   - name: Check for Terraform lock file in S3
+#     #     run: |
+#     #       LOCKFILE="terraform.lock"
+#     #       S3_BUCKET="my-terraform-state-bucket"
+#     #       S3_PATH="path/to/$LOCKFILE"  # Specify the path for the lock file
 
-    #       # Check if the lock file exists
-    #       aws s3 ls "s3://$S3_BUCKET/$S3_PATH" > /dev/null 2>&1
-    #       if [ $? -eq 0 ]; then
-    #         echo "Lock file exists. Another Terraform process is running. Exiting."
-    #         exit 1  # Exit the workflow if another process is running
-    #       else
-    #         echo "No lock file found. Proceeding with Terraform run."
-    #         # Create a lock file to prevent concurrent runs
-    #         aws s3 cp /dev/null "s3://$S3_BUCKET/$S3_PATH"  # Create empty lock file
-    #       fi
+#     #       # Check if the lock file exists
+#     #       aws s3 ls "s3://$S3_BUCKET/$S3_PATH" > /dev/null 2>&1
+#     #       if [ $? -eq 0 ]; then
+#     #         echo "Lock file exists. Another Terraform process is running. Exiting."
+#     #         exit 1  # Exit the workflow if another process is running
+#     #       else
+#     #         echo "No lock file found. Proceeding with Terraform run."
+#     #         # Create a lock file to prevent concurrent runs
+#     #         aws s3 cp /dev/null "s3://$S3_BUCKET/$S3_PATH"  # Create empty lock file
+#     #       fi
 
 
-    #   - name: Terraform Init
-    #     run: |
-    #       terraform init
+#     #   - name: Terraform Init
+#     #     run: |
+#     #       terraform init
 
-    #   - name: Terraform Plan
-    #     run: |
-    #       terraform plan
+#     #   - name: Terraform Plan
+#     #     run: |
+#     #       terraform plan
 
-    #   - name: Terraform Apply
-    #     run: |
-    #       terraform apply -auto-approve
+#     #   - name: Terraform Apply
+#     #     run: |
+#     #       terraform apply -auto-approve
 
-    #   - name: Release lock file from S3
-    #     run: |
-    #       LOCKFILE="terraform.lock"
-    #       S3_BUCKET="my-terraform-state-bucket"
-    #       S3_PATH="path/to/$LOCKFILE"  # Specify the path for the lock file
+#     #   - name: Release lock file from S3
+#     #     run: |
+#     #       LOCKFILE="terraform.lock"
+#     #       S3_BUCKET="my-terraform-state-bucket"
+#     #       S3_PATH="path/to/$LOCKFILE"  # Specify the path for the lock file
 
-    #       # Remove the lock file after Terraform finishes
-    #       aws s3 rm "s3://$S3_BUCKET/$S3_PATH"
+#     #       # Remove the lock file after Terraform finishes
+#     #       aws s3 rm "s3://$S3_BUCKET/$S3_PATH"
