@@ -11,7 +11,8 @@ jobs:
     permissions:
       id-token: write  # Required for OIDC role assumption
       contents: read   # Required for checking out the code
-
+    environment:
+        name: dev  # This can be dynamically set based on your environment
     env:
       AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}  # The role ARN for assuming the dev role
       AWS_REGION: ${{ secrets.AWS_REGION }}  # The AWS region from secrets
