@@ -12,12 +12,9 @@ jobs:
       id-token: write  # Required for OIDC role assumption
       contents: read   # Required for checking out the code
     
-    # environment:
-    #     name: dev  # This can be dynamically set based on your environment
-    env:
-      AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}  # The role ARN for assuming the dev role
-      AWS_REGION: ${{ secrets.AWS_REGION }}  # The AWS region from secrets
-      STATE_BUCKET_NAME: ${{ secrets.STATE_BUCKET_NAME }}  # The S3 bucket for state
+    environment:
+        name: dev  # This can be dynamically set based on your environment
+
 
     steps:
       - name: Checkout repository
@@ -26,8 +23,8 @@ jobs:
       - name: Set up AWS OIDC credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
         run: |
