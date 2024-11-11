@@ -6,6 +6,7 @@ resource "aws_s3_bucket" "state_backend" {
     enabled = true  # Enable versioning for state locking
   }
 
+
   lifecycle {
     prevent_destroy = true  # Prevent accidental deletion of the bucket
   }
