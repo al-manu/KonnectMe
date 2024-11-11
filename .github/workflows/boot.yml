@@ -25,6 +25,11 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+        
+      - name: Terraform Botting
+        run: |
+              terraform apply -target=aws_s3_bucket.state_backend
+
       - name: Check for Terraform lock file in S3
         run: |
           LOCKFILE="terraform.lock"
@@ -41,11 +46,8 @@ jobs:
             # Create a lock file to prevent concurrent runs
             aws s3 cp /dev/null "s3://$S3_BUCKET/$S3_PATH"  # Create empty lock file
           fi
-    
-      - name: Terraform Botting
-        run: |
-            terraform apply -target=aws_s3_bucket.state_backend
-            
+
+
       - name: Terraform Init
         run: |
           terraform init
