@@ -27,7 +27,7 @@ jobs:
    
       - name: Terraform Init
         run: |
-           terraform init
+           AWS_REGION=eu-central-1 terraform init
         
       - name: Terraform Botting
         run: |
