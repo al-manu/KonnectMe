@@ -36,7 +36,6 @@ jobs:
             -backend-config="key=terraform/state.tfstate" \
             -backend-config="region=${{ secrets.AWS_REGION }}" \
             -backend-config="encrypt=true" \
-            -backend-config="versioning=true"  # Enable versioning for locking in S3
 
       - name: Terraform Plan
         run: |
