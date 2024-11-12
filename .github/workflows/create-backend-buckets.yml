@@ -33,7 +33,7 @@ jobs:
  
       - name: Plan S3 bucket creation
         working-directory: terraform/backend_setup
-        run: terraform plan -var="environment=dev" -var="region=${{ secrets.AWS_REGION }}" -out="dev-backend.tfplan"
+        run: TF_LOG=DEBUG terraform plan -var="environment=dev" -var="region=${{ secrets.AWS_REGION }}" -out="dev-backend.tfplan"
  
       - name: Apply S3 bucket creation
         if: github.event_name == 'workflow_dispatch'
