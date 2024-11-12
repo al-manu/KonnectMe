@@ -12,18 +12,16 @@ provider "aws" {
   region = var.region
 }
 
-# Check if the bucket already exists
+# Attempt to read the existing bucket (if any)
 data "aws_s3_bucket" "existing" {
   bucket = "proj-${var.environment}-terraform-state"
-  # The data source will fail if the bucket does not exist
 }
 
-# Create the S3 bucket if it does not already exist
+# Create the bucket if it doesn't exist
 resource "aws_s3_bucket" "terraform_state" {
   count  = data.aws_s3_bucket.existing.id == "" ? 1 : 0
   bucket = "proj-${var.environment}-terraform-state"
   acl    = "private"
-
   tags = {
     Name        = "Terraform State Bucket - ${var.environment}"
     Environment = var.environment
