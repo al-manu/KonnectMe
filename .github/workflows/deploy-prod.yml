@@ -18,7 +18,6 @@ jobs:
       AWS_ROLE_ARN: ${{ secrets.AWS_PROD_ROLE_ARN }}  # Use the AWS role for production
       AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
       TF_VAR_TF_STATE_BUCKET: ${{ secrets.PROD_TF_STATE_BUCKET }}  # S3 bucket for Terraform state
-      # TF_STATE_LOCK_TABLE: ${{ secrets.TF_STATE_LOCK_TABLE }}  # Reference to your DynamoDB table name secret
 
 
     steps:
@@ -41,7 +40,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.PROD_TF_STATE_BUCKET }}" \
-            -backend-config="key=prod/prod.tfstate" \
+            -backend-config="key=prod.tfstate" \
             -backend-config="region=${{ env.AWS_REGION }}" \
 
       - name: Terraform Validate
