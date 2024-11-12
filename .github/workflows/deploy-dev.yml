@@ -12,6 +12,10 @@ jobs:
       id-token: write  # Required for OIDC
       contents: read  
 
+    concurrency:
+        group: "terraform-${{ github.ref }}"
+        cancel-in-progress: true  # Cancel any in-progress runs for the same group
+
     environment:
         name: dev 
     env:
@@ -30,6 +34,7 @@ jobs:
 
       - name: Check Environment Variables
         run: |
+          echo "terraform-${{ github.ref }}"
           echo "AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}"
           echo "AWS_REGION: ${{ secrets.AWS_REGION }}"
           echo "TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}"
