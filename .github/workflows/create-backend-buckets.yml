@@ -10,9 +10,9 @@ jobs:
       id-token: write  # Required for OIDC role assumption
       contents: read   # Required for checking out the code
  
-    strategy:
-      matrix:
-        environment: [dev, staging, prod]
+    # strategy:
+    #   matrix:
+    #     environment: [dev, staging, prod]
     environment: dev
     steps:
       - name: Checkout code
@@ -28,14 +28,14 @@ jobs:
         uses: hashicorp/setup-terraform@v2
  
       - name: Initialize Terraform for S3 bucket
-        working-directory: ./backend_setup
+        working-directory: terraform/backend_setup
         run: terraform init
  
       - name: Plan S3 bucket creation
-        working-directory: ./backend_setup
+        working-directory: terraform/backend_setup
         run: terraform plan -var="environment=${{ matrix.environment }}" -var="region=${{ secrets.AWS_REGION }}" -out="${{ matrix.environment }}-backend.tfplan"
  
       - name: Apply S3 bucket creation
         if: github.event_name == 'workflow_dispatch'
-        working-directory: ./backend_setup
+        working-directory: terraform/backend_setup
         run: terraform apply "${{ matrix.environment }}-backend.tfplan"
