@@ -28,14 +28,14 @@ jobs:
         uses: hashicorp/setup-terraform@v2
  
       - name: Initialize Terraform for S3 bucket
-        working-directory: terraform/backend_setup
+        working-directory: /backend_setup
         run: terraform init
  
       - name: Plan S3 bucket creation
-        working-directory: terraform/backend_setup
+        working-directory: /backend_setup
         run: terraform plan -var="environment=${{ matrix.environment }}" -var="region=${{ secrets.AWS_REGION }}" -out="${{ matrix.environment }}-backend.tfplan"
  
       - name: Apply S3 bucket creation
         if: github.event_name == 'workflow_dispatch'
-        working-directory: terraform/backend_setup
+        working-directory: /backend_setup
         run: terraform apply "${{ matrix.environment }}-backend.tfplan"
