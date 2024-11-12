@@ -56,10 +56,6 @@ resource "aws_s3_bucket" "in_bucket" {
   bucket = var.in_bucket_name
 }
 
-# Check if the bucket already exists
-data "aws_s3_bucket" "existing_bucket" {
-  bucket = "test-in-oct2401"  # The bucket name you want to check
-}
 
 # Create the output S3 bucket
 resource "aws_s3_bucket" "out_bucket" {
