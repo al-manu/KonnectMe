@@ -21,7 +21,11 @@ jobs:
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
-      TF_VAR_TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}  # Common state bucket for all environments
+      TF_VAR_TF_STATE_BUCKET: ${{ 
+        github.event.inputs.environment == 'prod' && secrets.PROD_TF_STATE_BUCKET ||
+        github.event.inputs.environment == 'sit' && secrets.SIT_TF_STATE_BUCKET ||
+        secrets.DEV_TF_STATE_BUCKET }} # Default to dev if no match
+      # TF_VAR_TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}  # Common state bucket for all environments
       # Dynamically select AWS_ROLE_ARN based on environment input
       AWS_ROLE_ARN: ${{ 
         github.event.inputs.environment == 'prod' && secrets.AWS_PROD_ROLE_ARN ||
