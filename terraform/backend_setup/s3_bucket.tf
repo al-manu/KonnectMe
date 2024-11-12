@@ -19,28 +19,30 @@ data "aws_s3_bucket" "existing" {
  
 # Create the S3 bucket if it does not already exist
 resource "aws_s3_bucket" "terraform_state" {
-count = data.aws_s3_bucket.existing.id == "" ? 1 : 0
+  count  = data.aws_s3_bucket.existing.id == "" ? 1 : 0
   bucket = "proj-${var.environment}-terraform-state"
   acl    = "private"
 
- 
   tags = {
     Name        = "Terraform State Bucket - ${var.environment}"
     Environment = var.environment
   }
 }
 
+# Create versioning configuration for the bucket
 resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
-  bucket = aws_s3_bucket.terraform_state.bucket
+  bucket = aws_s3_bucket.terraform_state[0].bucket  # Access the first (and only) instance
+
   versioning_configuration {
     status = "Enabled"
   }
+}
 
-  }
+# Create encryption configuration for the bucket
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
-count = data.aws_s3_bucket.existing.id == "" ? 1 : 0
-  bucket = aws_s3_bucket.terraform_state[0].bucket
- 
+  count = data.aws_s3_bucket.existing.id == "" ? 1 : 0
+  bucket = aws_s3_bucket.terraform_state[0].bucket  # Access the first (and only) instance
+
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -49,5 +51,5 @@ count = data.aws_s3_bucket.existing.id == "" ? 1 : 0
 }
  
 output "bucket_name" {
-  value = aws_s3_bucket.terraform_state[0].bucket
+  value = aws_s3_bucket.terraform_state[0].bucket  # Access the first (and only) instance
 }
