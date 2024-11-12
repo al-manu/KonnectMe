@@ -1,0 +1,73 @@
+name: Deploy to DEV environment
+
+on:
+  push:
+    branches:
+      - 'feature/*'  # Trigger on any push to a feature branch
+      
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read  
+
+    environment:
+        name: dev 
+    env:
+        AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.8
+
+      - name: Check Environment Variables
+        run: |
+          echo "AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}"
+          echo "AWS_REGION: ${{ secrets.AWS_REGION }}"
+          echo "TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}"
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v3 
+        with:
+          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}  # Direct reference
+          aws-region: ${{ secrets.AWS_REGION }}  # Direct reference
+
+      - name: Terraform Init
+        run: |
+          set -e
+          terraform init \
+            -backend-config="bucket=${{ secrets.DEV_TF_STATE_BUCKET }}" \
+            -backend-config="key=dev/dev.tfstate" \
+            -backend-config="region=${{ secrets.AWS_REGION }}"
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set -e
+          terraform plan -out=tfplan -var-file=environments/dev.tfvars
+
+      - name: Check for Changes in Plan
+        run: |
+          set -e
+          if terraform show tfplan | grep -q 'No changes. Infrastructure is up-to-date.'; then
+            echo "No changes to apply."
+            exit 0
+          fi
+
+      - name: Terraform Apply
+        run: |
+          set -e
+          terraform apply -auto-approve tfplan
+
+      - name: Cleanup
+        run: |
+          terraform workspace select default || terraform workspace new default

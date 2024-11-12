@@ -1,0 +1,75 @@
+name: Deploy to PROD environment
+
+on:
+  push:
+    branches:
+      # - main
+      - ff
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read   # Required for checking out the code
+      actions: write
+    environment:
+      name: prod  # Correct environment name if needed
+
+    env:
+      AWS_ROLE_ARN: ${{ secrets.AWS_PROD_ROLE_ARN }}  # Use the AWS role for production
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
+      TF_VAR_TF_STATE_BUCKET: ${{ secrets.PROD_TF_STATE_BUCKET }}  # S3 bucket for Terraform state
+      # TF_STATE_LOCK_TABLE: ${{ secrets.TF_STATE_LOCK_TABLE }}  # Reference to your DynamoDB table name secret
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.8
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}  # Use the environment variable
+          aws-region: ${{ env.AWS_REGION }}  # Use the environment variable
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.PROD_TF_STATE_BUCKET }}" \
+            -backend-config="key=prod/prod.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+
+      - name: Terraform Validate
+        run: |
+            set -e
+            terraform validate
+    
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -out=tfplan -var-file=environments/prod.tfvars
+
+      - name: Check for Changes in Plan
+        run: |
+          if terraform show tfplan | grep -q 'No changes. Infrastructure is up-to-date.'; then
+            echo "No changes to apply."
+            exit 0
+          fi
+
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve tfplan
+
+      # # Automatically delete the merged branch using the peter-evans/delete-branch action
+      # - name: Delete merged branch
+      #   uses: peter-evans/delete-branch@v2
+      #   with:
+      #     branch: ${{ github.head_ref }}  # Deletes the source branch of the merged PR
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token to authenticate API calls

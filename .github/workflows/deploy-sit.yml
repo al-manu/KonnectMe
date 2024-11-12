@@ -1,0 +1,72 @@
+name: Deploy to SIT environment
+
+on:
+  pull_request_review:
+    types: [submitted]  # Trigger when a review is submitted (approved, changes requested, or dismissed)
+
+jobs:
+  deploy:
+    # Only proceed if the review state is 'approved'
+    if: github.event.review.state == 'approved'  
+    
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read   # Required for checking out the code
+
+    environment:
+      name: sit  # Use the 'sit' environment
+
+    env:
+      AWS_ROLE_ARN: ${{ secrets.AWS_SIT_ROLE_ARN }}  # The ARN of the AWS role
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # The AWS region
+      TF_VAR_TF_STATE_BUCKET: ${{ secrets.SIT_TF_STATE_BUCKET }}  # The S3 bucket for Terraform state
+    
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # Checkout the code
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2  # Set up Terraform
+        with:
+          terraform_version: 1.9.8  # Set the Terraform version
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v3 
+        with:
+          role-to-assume: ${{ secrets.AWS_SIT_ROLE_ARN }}  # Use the secret directly
+          aws-region: ${{ secrets.AWS_REGION }}  # Use the secret directly
+
+      - name: Terraform Init
+        run: |
+          set -e  # Exit on error
+          terraform init \
+            # -backend-config="bucket=${{ secrets.SIT_TF_STATE_BUCKET }}" \
+            -backend-config="key=sit/sit.tfstate" \
+            -backend-config="region=${{ secrets.AWS_REGION }}" \
+
+      - name: Terraform Validate
+        run: |
+          set -e
+          terraform validate  # Ensure the configuration is valid
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set -e
+          terraform plan -out=tfplan -var-file=environments/sit.tfvars  # Plan the changes for SIT environment
+
+      - name: Check for Changes in Plan
+        run: |
+          set -e
+          if terraform show tfplan | grep -q 'No changes. Infrastructure is up-to-date.'; then
+            echo "No changes to apply."
+            exit 0  # Skip apply if no changes
+          fi
+
+      - name: Terraform Apply
+        run: |
+          set -e
+          terraform apply -auto-approve tfplan  # Apply the changes to SIT environment
