@@ -1,45 +1,45 @@
 name: Create S3 Buckets for State Files
 
 on:
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Specify the environment to destroy (dev, sit, prod)'
+        required: true
+        default: 'dev'
 
 jobs:
   create-backend-buckets:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write  # Required for OIDC role assumption
-      contents: read   # Required for checking out the code
+    environment:
+      name: ${{ github.event.inputs.environment }}  # Dynamically use the input environment
+      url: ${{ steps.deploy.outputs.url }}
 
-    strategy:
-      matrix:
-        environment: [dev, sit, prod]  # Define the environments for the matrix
-        # role : ${{ secrets['AWS_' + matrix.environment | upper] + '_ROLE_ARN' }}
+    permissions:
+      id-token: write  # Required for OIDC authentication
+      contents: read   # Access to repository contents
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
+      # Dynamically select AWS_ROLE_ARN based on environment input
+      AWS_ROLE_ARN: ${{ 
+        github.event.inputs.environment == 'prod' && secrets.AWS_PROD_ROLE_ARN ||
+        github.event.inputs.environment == 'sit' && secrets.AWS_SIT_ROLE_ARN ||
+        secrets.AWS_DEV_ROLE_ARN }} # Default to dev if no match
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        - name: Set up Terraform
+          uses: hashicorp/setup-terraform@v2
 
-      - name: Configure AWS credentials for ${{ matrix.environment }} environment
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          # Map environment to corresponding role ARN secret
-          role-to-assume: ${{ matrix.environment == 'dev' && secrets.AWS_DEV_ROLE_ARN ||
-                              matrix.environment == 'sit' && secrets.AWS_SIT_ROLE_ARN ||
-                              matrix.environment == 'prod' && secrets.AWS_PROD_ROLE_ARN}}
-          aws-region: ${{ secrets.AWS_REGION }}
+        - name: Initialize Terraform for S3 bucket
+          working-directory: terraform/backend_setup
+          run: terraform init
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+        - name: Plan S3 bucket creation for ${{ github.event.inputs.environment }}
+          working-directory: terraform/backend_setup
+          run: TF_LOG=DEBUG terraform plan -var="environment=${{ github.event.inputs.environment }}" -var="region=${{ secrets.AWS_REGION }}" -out="${{ matrix.environment }}-backend.tfplan"
 
-      - name: Initialize Terraform for S3 bucket
-        working-directory: terraform/backend_setup
-        run: terraform init
-
-      - name: Plan S3 bucket creation for ${{ matrix.environment }}
-        working-directory: terraform/backend_setup
-        run: TF_LOG=DEBUG terraform plan -var="environment=${{ matrix.environment }}" -var="region=${{ secrets.AWS_REGION }}" -out="${{ matrix.environment }}-backend.tfplan"
-
-      - name: Apply S3 bucket creation for ${{ matrix.environment }}
-        if: github.event_name == 'workflow_dispatch'
-        working-directory: terraform/backend_setup
-        run: terraform apply "${{ matrix.environment }}-backend.tfplan"
+        - name: Apply S3 bucket creation for ${{github.event.inputs.environment }}
+          if: github.event_name == 'workflow_dispatch'
+          working-directory: terraform/backend_setup
+          run: terraform apply "${{ github.event.inputs.environment }}-backend.tfplan"
