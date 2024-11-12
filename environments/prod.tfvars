@@ -1,2 +1,2 @@
-environment = "prod"
-bucket_name = "my-terraform-state-bucket"
+# environment = "prod"
+# bucket_name = "my-terraform-state-bucket"

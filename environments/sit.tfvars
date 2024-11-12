@@ -1,2 +1,2 @@
-environment = "sit"
-bucket_name = "my-terraform-state-bucket"
+# environment = "sit"
+# bucket_name = "my-terraform-state-bucket"
