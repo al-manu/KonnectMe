@@ -6,6 +6,9 @@ on:
 jobs:
   create-backend-buckets:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC role assumption
+      contents: read   # Required for checking out the code
  
     strategy:
       matrix:
