@@ -3,8 +3,7 @@ name: Deploy to PROD environment
 on:
   push:
     branches:
-      # - main
-      - ff
+      - main
 jobs:
   terraform:
     runs-on: ubuntu-latest
