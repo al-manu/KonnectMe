@@ -1,27 +1,28 @@
-name: Deploy to DEV environment
+name: Deploy to DEV
 
 on:
   push:
     branches:
-      - 'feature/*'  # Trigger on any push to a feature branch
-      
+      - 'feature/*'
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     permissions:
       id-token: write  # Required for OIDC
       contents: read  
 
-    concurrency:
-        group: "terraform-${{ github.ref }}"
-        cancel-in-progress: true  # Cancel any in-progress runs for the same group
-
     environment:
-        name: dev 
+      name: dev
+
     env:
-        AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}
+      AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}
+      STATE_FILE: dev.tfstate
+      LOCK_TAG_KEY: lock
+      LOCK_TAG_VALUE: true
 
     steps:
       - name: Checkout code
@@ -32,49 +33,60 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      - name: Check Environment Variables
-        run: |
-          echo "terraform-${{ github.ref }}"
-          echo "AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}"
-          echo "AWS_REGION: ${{ secrets.AWS_REGION }}"
-          echo "TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}"
-
       - name: Configure AWS credentials
-        id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v3 
+        uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}  # Direct reference
-          aws-region: ${{ secrets.AWS_REGION }}  # Direct reference
+          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Check and Acquire Lock
+        id: acquire_lock
+        run: |
+          # Check if the lock exists
+          LOCK_EXISTS=$(aws s3api get-object-tagging \
+            --bucket ${{ secrets.DEV_TF_STATE_BUCKET }} \
+            --key ${{ env.STATE_FILE }} \
+            --region ${{ secrets.AWS_REGION }} \
+            --query "TagSet[?Key=='${{ env.LOCK_TAG_KEY }}'].Value" \
+            --output text)
+
+          if [[ "$LOCK_EXISTS" == "${{ env.LOCK_TAG_VALUE }}" ]]; then
+            echo "State file is locked. Another operation is currently in progress."
+            exit 1
+          fi
+
+          # Lock the state file by adding the lock tag
+          aws s3api put-object-tagging \
+            --bucket ${{ secrets.DEV_TF_STATE_BUCKET }} \
+            --key ${{ env.STATE_FILE }} \
+            --tagging "TagSet=[{Key=${{ env.LOCK_TAG_KEY }},Value=${{ env.LOCK_TAG_VALUE }} }]" \
+            --region ${{ secrets.AWS_REGION }}
+
+          echo "Lock acquired on state file."
 
       - name: Terraform Init
         run: |
-          set -e
           terraform init \
             -var-file=./environments/dev.tfvars \
             -backend-config="bucket=${{ secrets.DEV_TF_STATE_BUCKET }}" \
-            -backend-config="key=dev.tfstate" \
+            -backend-config="key=${{ env.STATE_FILE }}" \
             -backend-config="region=${{ secrets.AWS_REGION }}"
-           
 
       - name: Terraform Plan
         id: plan
         run: |
-          set -e
-          terraform plan -out=tfplan -var-file=environments/dev.tfvars
-
-      - name: Check for Changes in Plan
-        run: |
-          set -e
-          if terraform show tfplan | grep -q 'No changes. Infrastructure is up-to-date.'; then
-            echo "No changes to apply."
-            exit 0
-          fi
+          terraform plan -out=tfplan -var-file=./environments/dev.tfvars
 
       - name: Terraform Apply
         run: |
-          set -e
           terraform apply -auto-approve tfplan
 
-      - name: Cleanup
+      - name: Release Lock
         run: |
-          terraform workspace select default || terraform workspace new default
+          # Remove the lock tag
+          aws s3api delete-object-tagging \
+            --bucket ${{ secrets.DEV_TF_STATE_BUCKET }} \
+            --key ${{ env.STATE_FILE }} \
+            --region ${{ secrets.AWS_REGION }}
+          
+          echo "Lock released."
