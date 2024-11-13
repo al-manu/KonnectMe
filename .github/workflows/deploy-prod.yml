@@ -18,6 +18,9 @@ jobs:
       AWS_ROLE_ARN: ${{ secrets.AWS_PROD_ROLE_ARN }}  # Use the AWS role for production
       AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
       TF_VAR_TF_STATE_BUCKET: ${{ secrets.PROD_TF_STATE_BUCKET }}  # S3 bucket for Terraform state
+      STATE_FILE: dev.tfstate
+      LOCK_TAG_KEY: lock
+      LOCK_TAG_VALUE: true
 
 
     steps:
@@ -35,6 +38,31 @@ jobs:
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}  # Use the environment variable
           aws-region: ${{ env.AWS_REGION }}  # Use the environment variable
+
+      - name: Check and Acquire Lock
+        id: acquire_lock
+        run: |
+              # Check if the lock exists
+              LOCK_EXISTS=$(aws s3api get-object-tagging \
+                --bucket ${{ secrets.PROD_TF_STATE_BUCKET }} \
+                --key ${{ env.STATE_FILE }} \
+                --region ${{ secrets.AWS_REGION }} \
+                --query "TagSet[?Key=='${{ env.LOCK_TAG_KEY }}'].Value" \
+                --output text)
+    
+              if [[ "$LOCK_EXISTS" == "${{ env.LOCK_TAG_VALUE }}" ]]; then
+                echo "State file is locked. Another operation is currently in progress."
+                exit 1
+              fi
+    
+              # Lock the state file by adding the lock tag
+              aws s3api put-object-tagging \
+                --bucket ${{ secrets.PROD_TF_STATE_BUCKET }} \
+                --key ${{ env.STATE_FILE }} \
+                --tagging "TagSet=[{Key=${{ env.LOCK_TAG_KEY }},Value=${{ env.LOCK_TAG_VALUE }} }]" \
+                --region ${{ secrets.AWS_REGION }}
+    
+              echo "Lock acquired on state file."
 
       - name: Terraform Init
         run: |
@@ -63,6 +91,17 @@ jobs:
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve tfplan
+
+
+      - name: Release Lock
+        run: |
+              # Remove the lock tag
+              aws s3api delete-object-tagging \
+                --bucket ${{ secrets.PROD_TF_STATE_BUCKET }} \
+                --key ${{ env.STATE_FILE }} \
+                --region ${{ secrets.AWS_REGION }}
+              
+              echo "Lock released."
 
       # # Automatically delete the merged branch using the peter-evans/delete-branch action
       # - name: Delete merged branch
