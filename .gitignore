@@ -50,3 +50,34 @@ Thumbs.db        # Windows image file cache
 # Miscellaneous
 *.bak
 *.swp
+
+# Additional ignores for security and local files
+# Ignore AWS credentials files
+.aws/              # Local AWS credentials or configuration directory
+*.aws/             # Local AWS credentials or config
+
+# Ignore local or temporary files created by Terraform
+terraform.tfvars.d/ # Temporary files for tfvars directory (if used)
+*.tfvars.local      # Local tfvars files specific to environments (if used)
+
+# Ignore lockfiles for version managers (e.g., Node, Python, etc.)
+package-lock.json
+yarn.lock
+Pipfile.lock
+
+# Ignore NPM / Yarn / Pip package manager directories
+node_modules/
+.vscode/
+
+# Ignore IDE specific configuration (common across multiple IDEs)
+*.code-workspace
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore log files for security and troubleshooting
+*.log
+
+# Ignore shell history files (can contain sensitive data)
+*.bash_history
+*.zsh_history
