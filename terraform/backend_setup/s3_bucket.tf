@@ -15,7 +15,7 @@ provider "aws" {
 # Create the S3 bucket (if it does not exist)
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "proj-${var.environment}-terraform-state"
-  acl    = "private"
+  # acl    = "private"
 
   tags = {
     Name        = "Terraform State Bucket - ${var.environment}"
@@ -46,3 +46,4 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
 output "bucket_name" {
   value = aws_s3_bucket.terraform_state.bucket
 }
+
