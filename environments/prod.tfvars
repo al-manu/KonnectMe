@@ -5,7 +5,7 @@
 in_bucket_name = "dwh-prod-ingestion"
 
 # The output S3 bucket where transformed data is staged.
-out_bucket_name = "dwh-prod-staginggg"  
+out_bucket_name = "dwh-prod-stagingggg"  
 
 # Temporary S3 bucket for refined/processed data.
 tmp_bucket_name = "dwh-prod-refined"
