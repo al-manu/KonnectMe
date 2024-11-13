@@ -1,0 +1,52 @@
+# Terraform
+# Ignore .terraform directory (Terraform's working directory)
+.terraform/
+
+# Ignore Terraform state files (including backup files)
+*.tfstate
+*.tfstate.*
+
+# Ignore crash log file (created in case of Terraform crashes)
+crash.log
+
+# Ignore sensitive files
+# This can include Terraform variable files that may contain secrets (like AWS credentials)
+*.tfvars
+*.tfvars.json
+
+# Ignore override files (useful when you're using Terraform workspaces or for local overrides)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore plan files
+*.tfplan
+
+# Ignore plan output files from Terraform runs
+*.tfplan*
+
+# Ignore .terraform.lock.hcl file (this can be important in certain cases, but some teams choose to ignore it)
+.terraform.lock.hcl
+
+# GitHub Actions
+# Ignore workflow logs
+.github/workflows/*.log
+
+# Ignore environment variables or secrets files
+.env
+*.env
+
+# Operating system files
+.DS_Store        # macOS Finder settings
+Thumbs.db        # Windows image file cache
+
+# IDE/Editor-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Miscellaneous
+*.bak
+*.swp
