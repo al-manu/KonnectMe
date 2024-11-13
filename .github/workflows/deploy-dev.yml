@@ -50,10 +50,11 @@ jobs:
         run: |
           set -e
           terraform init \
+            -var-file=./environments/dev.tfvars
             -backend-config="bucket=${{ secrets.DEV_TF_STATE_BUCKET }}" \
             -backend-config="key=dev.tfstate" \
             -backend-config="region=${{ secrets.AWS_REGION }}"
-            -var-file=./environments/dev.tfvars
+           
 
       - name: Terraform Plan
         id: plan
