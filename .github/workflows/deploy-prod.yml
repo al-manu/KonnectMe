@@ -18,7 +18,7 @@ jobs:
       AWS_ROLE_ARN: ${{ secrets.AWS_PROD_ROLE_ARN }}  # Use the AWS role for production
       AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
       TF_VAR_TF_STATE_BUCKET: ${{ secrets.PROD_TF_STATE_BUCKET }}  # S3 bucket for Terraform state
-      STATE_FILE: dev.tfstate
+      STATE_FILE: prod.tfstate
       LOCK_TAG_KEY: lock
       LOCK_TAG_VALUE: true
 
