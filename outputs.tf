@@ -1,15 +1,20 @@
-output "in_bucket_arn" {
-  value = aws_s3_bucket.in_bucket.arn  # ARN of the input bucket
+# Outputs from the S3 module
+output "in_bucket_id" {
+  description = "The ID of the input S3 bucket"
+  value       = module.s3_buckets.in_bucket_id
 }
 
-output "out_bucket_arn" {
-  value = aws_s3_bucket.out_bucket.arn  # ARN of the output bucket.
+output "out_bucket_id" {
+  description = "The ID of the output S3 bucket"
+  value       = module.s3_buckets.out_bucket_id
 }
 
-output "tmp_bucket_arn" {
-  value = aws_s3_bucket.tmp_bucket.arn  # ARN of the temporary bucket.
+output "tmp_bucket_id" {
+  description = "The ID of the temporary S3 bucket"
+  value       = module.s3_buckets.tmp_bucket_id
 }
 
-output "export_bucket_arn" {
-  value = aws_s3_bucket.export_bucket.arn  # ARN of the export bucket.
+output "export_bucket_id" {
+  description = "The ID of the export S3 bucket"
+  value       = module.s3_buckets.export_bucket_id
 }
