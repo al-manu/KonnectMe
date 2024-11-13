@@ -1,6 +1,5 @@
-# environment = "sit"
-# bucket_name = "my-terraform-state-bucket"
-in_bucket_name  = "test-in-sit-oct1211"
-out_bucket_name = "test-out-sit-oct1211"
-tmp_bucket_name = "test-tmp-sit-oct1211"
-export_bucket_name = "test-export-sit-oct1211"
+
+in_bucket_name  = "dwh-sit-ingestion"
+out_bucket_name = "dwh-sit-staging"
+tmp_bucket_name = "dwh-sit-refined"
+export_bucket_name = "dwh-sit-curated"

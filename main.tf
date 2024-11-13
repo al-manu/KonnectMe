@@ -1,23 +1,9 @@
-# --------------------------------------------------------------------------------------
-# Create S3 buckets 
-# --------------------------------------------------------------------------------------
+module "s3_buckets" {
+  source = "./modules/S3"  # Path to the S3 module
 
-# Create the input S3 bucket
-resource "aws_s3_bucket" "in_bucket" {
-  bucket = var.in_bucket_name  # Name of the input bucket.
-}
-
-# Create the output S3 bucket
-resource "aws_s3_bucket" "out_bucket" {
-  bucket = var.out_bucket_name  # Name of the output bucket
-}
-
-# Create the temporary S3 bucket
-resource "aws_s3_bucket" "tmp_bucket" {
-  bucket = var.tmp_bucket_name  # Name of the temporary bucket
-}
-
-# Create the export S3 bucket
-resource "aws_s3_bucket" "export_bucket" {
-  bucket = var.export_bucket_name  # Name of the export bucket
+  # Pass the required variables, which will be read from dev.tfvars
+  in_bucket_name     = var.in_bucket_name
+  out_bucket_name    = var.out_bucket_name
+  tmp_bucket_name    = var.tmp_bucket_name
+  export_bucket_name = var.export_bucket_name
 }

@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.environment }}  # Dynamically use the input environment
-      url: ${{ steps.deploy.outputs.url }}
 
     permissions:
       id-token: write  # Required for OIDC authentication

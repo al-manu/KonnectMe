@@ -1,6 +1,4 @@
-# variables.tf (Root Level)
-
-# S3 bucket names for different purposes
+# modules/S3/variables.tf
 variable "in_bucket_name" {
   description = "Name for the input S3 bucket"
   type        = string
