@@ -1,60 +1,72 @@
+# This GitHub Actions workflow is used to create S3 buckets for storing Terraform state files.
+# It supports dynamic environment selection (dev, sit, prod) and uses OIDC authentication 
+# for AWS security best practices.
+
 name: Create S3 Buckets for State Files
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering of the workflow with inputs
     inputs:
-      environment:
-        description: 'Specify the environment to destroy (dev, sit, prod)'
+      environment:  # This input will define the environment (dev, sit, prod)
+        description: 'Specify the environment to create the S3 bucket (dev, sit, prod)'
         required: true
-        default: 'dev'
+        default: 'dev'  # Default is 'dev' if no environment is specified
 
 jobs:
   create-backend-buckets:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
     environment:
-      name: ${{ github.event.inputs.environment }}  # Dynamically use the input environment
+      name: ${{ github.event.inputs.environment }}  # Dynamically use the environment input
+      # Consider setting up GitHub environment protections for production deployments.
 
     permissions:
-      id-token: write  # Required for OIDC authentication
-      contents: read   # Access to repository contents
+      id-token: write  # Required for OIDC authentication (to assume roles)
+      contents: read   # Read access to repository contents (for GitHub Actions)
 
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}  # Use the AWS region from secrets
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # Fetch the AWS region from secrets
       # Dynamically select AWS_ROLE_ARN based on environment input
       AWS_ROLE_ARN: ${{ 
         github.event.inputs.environment == 'prod' && secrets.AWS_PROD_ROLE_ARN ||
         github.event.inputs.environment == 'sit' && secrets.AWS_SIT_ROLE_ARN ||
-        secrets.AWS_DEV_ROLE_ARN }} # Default to dev if no match
+        secrets.AWS_DEV_ROLE_ARN }}  # Default to dev if no match
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Checkout the code
+        uses: actions/checkout@v3  # Checkout the code from the repository
+        # Note: This step is required to access the Terraform configuration files.
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v2  # Set up Terraform CLI for this workflow
         with:
-          terraform_version: 1.9.8  # Set the Terraform version
+          terraform_version: 1.9.8  # Ensure you're using a specific Terraform version (best practice for reproducibility)
 
       - name: Configure AWS credentials
         id: aws_auth
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}  # Assume the appropriate role dynamically
-          aws-region: ${{ env.AWS_REGION }}  # Use the AWS region from the environment
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}  # Assume the appropriate role based on environment
+          aws-region: ${{ env.AWS_REGION }}  # AWS region set as an environment variable
         env:
-          AWS_ROLE_ARN: ${{ env.AWS_ROLE_ARN }}  # Use the environment variable for the role ARN
-          AWS_REGION: ${{ env.AWS_REGION }}  # Use the environment variable for the AWS region
-          TF_VAR_TF_STATE_BUCKET: ${{ env.TF_VAR_TF_STATE_BUCKET }}  # Use the environment variable for the state bucket
+          AWS_ROLE_ARN: ${{ env.AWS_ROLE_ARN }}  # Pass the assumed role ARN into environment variables
+          AWS_REGION: ${{ env.AWS_REGION }}  # Pass the region into environment variables
+          TF_VAR_TF_STATE_BUCKET: ${{ env.TF_VAR_TF_STATE_BUCKET }}  # Dynamically pass the state bucket name (optional, if used)
 
       - name: Initialize Terraform for S3 bucket
-        working-directory: terraform/backend_setup
-        run: terraform init
+        working-directory: terraform/backend_setup  # Ensure the correct directory for Terraform configuration
+        run: terraform init  # Initialize Terraform working directory
 
       - name: Plan S3 bucket creation for ${{ github.event.inputs.environment }}
-        working-directory: terraform/backend_setup
-        run: TF_LOG=DEBUG terraform plan -var="environment=${{ github.event.inputs.environment }}" -var="region=${{ secrets.AWS_REGION }}" -out="${{ github.event.inputs.environment }}-backend.tfplan"
+        working-directory: terraform/backend_setup  # Ensure the correct directory for Terraform configuration
+        run: |
+          TF_LOG=DEBUG terraform plan -var="environment=${{ github.event.inputs.environment }}" \
+            -var="region=${{ secrets.AWS_REGION }}" \
+            -out="${{ github.event.inputs.environment }}-backend.tfplan"  # Output plan file for deployment
+        # Best practice: Always use `terraform plan` before applying any changes.
 
-      - name: Apply S3 bucket creation for ${{github.event.inputs.environment }}
-        if: github.event_name == 'workflow_dispatch'
-        working-directory: terraform/backend_setup
-        run: terraform apply "${{ github.event.inputs.environment }}-backend.tfplan"
+      - name: Apply S3 bucket creation for ${{ github.event.inputs.environment }}
+        if: github.event_name == 'workflow_dispatch'  # Ensure that this step only runs if the workflow was manually triggered
+        working-directory: terraform/backend_setup  # Ensure the correct directory for Terraform configuration
+        run: terraform apply "${{ github.event.inputs.environment }}-backend.tfplan"  # Apply the generated plan
+        # Best practice: Always apply only after reviewing the `plan` step. This avoids unintended changes.

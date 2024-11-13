@@ -1,48 +1,57 @@
+# This GitHub Actions workflow automates the deployment process to the DEV environment.
+# It is triggered when code is pushed to a feature branch (using the 'feature/*' pattern).
+# The workflow follows best practices for locking the Terraform state file to avoid race conditions
+# and uses OIDC for secure AWS authentication.
+
 name: Deploy to DEV environment
 
 on:
   push:
     branches:
-      - 'feature/*'
+      - 'feature/*'  # Trigger on push to feature branches
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
     permissions:
-      id-token: write  # Required for OIDC
-      contents: read  
+      id-token: write  # Required for OIDC authentication to assume AWS roles
+      contents: read   # Read access to repository contents (needed to access the Terraform files)
 
     environment:
-      name: dev
+      name: dev  # Environment name is explicitly set to 'dev'
 
     env:
-      AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}
-      STATE_FILE: dev.tfstate
-      LOCK_TAG_KEY: lock
-      LOCK_TAG_VALUE: true
+      AWS_ROLE_ARN: ${{ secrets.AWS_DEV_ROLE_ARN }}  # Use secrets to fetch the role ARN for the dev environment
+      AWS_REGION: ${{ secrets.AWS_REGION }}  # Fetch AWS region from secrets
+      TF_VAR_TF_STATE_BUCKET: ${{ secrets.DEV_TF_STATE_BUCKET }}  # Fetch the name of the S3 bucket for the Terraform state
+      STATE_FILE: dev.tfstate  # State file name for the dev environment
+      LOCK_TAG_KEY: lock  # Key for the lock tag in S3
+      LOCK_TAG_VALUE: true  # Value to indicate that the state file is locked
 
     steps:
+      # Checkout the repository code to get the Terraform files
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Checkout the latest code from the repository
 
+      # Set up Terraform CLI for the workflow
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.9.8
+          terraform_version: 1.9.8  # Pin the Terraform version for consistent behavior
 
+      # Configure AWS credentials using OIDC and assume the required role
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}  # Dynamically use the dev role from secrets
+          aws-region: ${{ secrets.AWS_REGION }}  # Fetch the region from secrets
 
+      # Check if the state file is locked (prevents multiple workflows from running simultaneously)
       - name: Check and Acquire Lock
         id: acquire_lock
         run: |
-          # Check if the lock exists
+          # Check if the lock tag exists on the S3 object (state file)
           LOCK_EXISTS=$(aws s3api get-object-tagging \
             --bucket ${{ secrets.DEV_TF_STATE_BUCKET }} \
             --key ${{ env.STATE_FILE }} \
@@ -50,12 +59,13 @@ jobs:
             --query "TagSet[?Key=='${{ env.LOCK_TAG_KEY }}'].Value" \
             --output text)
 
+          # If the lock exists, exit with an error
           if [[ "$LOCK_EXISTS" == "${{ env.LOCK_TAG_VALUE }}" ]]; then
             echo "State file is locked. Another operation is currently in progress."
             exit 1
           fi
 
-          # Lock the state file by adding the lock tag
+          # Lock the state file by adding the lock tag to it
           aws s3api put-object-tagging \
             --bucket ${{ secrets.DEV_TF_STATE_BUCKET }} \
             --key ${{ env.STATE_FILE }} \
@@ -64,29 +74,33 @@ jobs:
 
           echo "Lock acquired on state file."
 
+      # Initialize Terraform to prepare the environment and configure the backend
       - name: Terraform Init
         run: |
           terraform init \
             -var-file=./environments/dev.tfvars \
             -backend-config="bucket=${{ secrets.DEV_TF_STATE_BUCKET }}" \
             -backend-config="key=${{ env.STATE_FILE }}" \
-            -backend-config="region=${{ secrets.AWS_REGION }}"
+            -backend-config="region=${{ secrets.AWS_REGION }}"  # Ensure the correct backend configuration for state storage
 
+      # Run the Terraform Plan to preview the changes
       - name: Terraform Plan
         id: plan
         run: |
-          terraform plan -out=tfplan -var-file=./environments/dev.tfvars
+          terraform plan -out=tfplan -var-file=./environments/dev.tfvars  # Plan and output to tfplan file
 
+      # Apply the Terraform changes
       - name: Terraform Apply
         run: |
-          terraform apply -auto-approve tfplan
+          terraform apply -auto-approve tfplan  # Apply the plan automatically (auto-approve is typically fine for dev)
 
+      # Release the lock on the state file after Terraform apply is successful
       - name: Release Lock
         run: |
-          # Remove the lock tag
+          # Remove the lock tag from the state file to indicate that the operation has finished
           aws s3api delete-object-tagging \
             --bucket ${{ secrets.DEV_TF_STATE_BUCKET }} \
             --key ${{ env.STATE_FILE }} \
             --region ${{ secrets.AWS_REGION }}
-          
+
           echo "Lock released."
