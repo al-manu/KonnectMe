@@ -21,6 +21,9 @@ jobs:
       AWS_ROLE_ARN: ${{ secrets.AWS_SIT_ROLE_ARN }}  # The ARN of the AWS role
       AWS_REGION: ${{ secrets.AWS_REGION }}  # The AWS region
       TF_VAR_TF_STATE_BUCKET: ${{ secrets.SIT_TF_STATE_BUCKET }}  # The S3 bucket for Terraform state
+      STATE_FILE: sit.tfstate
+      LOCK_TAG_KEY: lock
+      LOCK_TAG_VALUE: true
     
 
     steps:
@@ -38,6 +41,31 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_SIT_ROLE_ARN }}  # Use the secret directly
           aws-region: ${{ secrets.AWS_REGION }}  # Use the secret directly
+
+      - name: Check and Acquire Lock
+        id: acquire_lock
+        run: |
+            # Check if the lock exists
+            LOCK_EXISTS=$(aws s3api get-object-tagging \
+              --bucket ${{ secrets.SIT_TF_STATE_BUCKET }} \
+              --key ${{ env.STATE_FILE }} \
+              --region ${{ secrets.AWS_REGION }} \
+              --query "TagSet[?Key=='${{ env.LOCK_TAG_KEY }}'].Value" \
+              --output text)
+  
+            if [[ "$LOCK_EXISTS" == "${{ env.LOCK_TAG_VALUE }}" ]]; then
+              echo "State file is locked. Another operation is currently in progress."
+              exit 1
+            fi
+  
+            # Lock the state file by adding the lock tag
+            aws s3api put-object-tagging \
+              --bucket ${{ secrets.SIT_TF_STATE_BUCKET }} \
+              --key ${{ env.STATE_FILE }} \
+              --tagging "TagSet=[{Key=${{ env.LOCK_TAG_KEY }},Value=${{ env.LOCK_TAG_VALUE }} }]" \
+              --region ${{ secrets.AWS_REGION }}
+  
+            echo "Lock acquired on state file."
 
       - name: Terraform Init
         run: |
@@ -70,3 +98,14 @@ jobs:
         run: |
           set -e
           terraform apply -auto-approve tfplan  # Apply the changes to SIT environment
+
+
+      - name: Release Lock
+        run: |
+            # Remove the lock tag
+            aws s3api delete-object-tagging \
+              --bucket ${{ secrets.SIT_TF_STATE_BUCKET }} \
+              --key ${{ env.STATE_FILE }} \
+              --region ${{ secrets.AWS_REGION }}
+            
+            echo "Lock released."
