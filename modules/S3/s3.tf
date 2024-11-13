@@ -1,24 +1,19 @@
-# # --------------------------------------------------------------------------------------
-# # Create S3 buckets 
-# # --------------------------------------------------------------------------------------
-
-# Create the input S3 bucket
-resource "aws_s3_bucket" "in_bucket" {
-  # count  = length(data.aws_s3_bucket.existing_bucket) == 0 ? 1 : 0
-  bucket = var.in_bucket_name  # Name of the input bucket.
+resource "aws_s3_bucket" "in" {
+  bucket = var.in_bucket_name
+  acl    = "private"  # You can adjust the ACL as needed
 }
 
-# Create the output S3 bucket
-resource "aws_s3_bucket" "out_bucket" {
-  bucket = var.out_bucket_name  # Name of the output bucket
+resource "aws_s3_bucket" "out" {
+  bucket = var.out_bucket_name
+  acl    = "private"
 }
 
-# Create the temporary S3 bucket
-resource "aws_s3_bucket" "tmp_bucket" {
-  bucket = var.tmp_bucket_name  # Name of the temporary bucket
+resource "aws_s3_bucket" "tmp" {
+  bucket = var.tmp_bucket_name
+  acl    = "private"
 }
 
-# Create the export S3 bucket
-resource "aws_s3_bucket" "export_bucket" {
-  bucket = var.export_bucket_name  # Name of the export bucket
+resource "aws_s3_bucket" "export" {
+  bucket = var.export_bucket_name
+  acl    = "private"
 }
