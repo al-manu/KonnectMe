@@ -23,11 +23,11 @@ export_bucket_name = "dwh-dev-curated"
 redshift_db_name         = "dwhtest1"
 redshift_master_username = "admin"
 redshift_master_password = "MySecurePassword1234!"
-base_capacity            = 0  # Redshift Serverless minimal capacity
+base_capacity            = 0  # Redshift Serverlesss minimal capacity
 # VPC and Networking Variables
 cidr_block            = "10.0.0.0/16"
 public_subnet_cidr    = "10.0.0.0/22"
-private_subnet_cidr   = "10.0.0.0/22"
+private_subnet_cidr   = "10.0.4.0/22"
 public_subnet_az      = "eu-central-1a"
 private_subnet_az     = "eu-central-1b"
 
