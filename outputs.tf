@@ -18,3 +18,7 @@ output "export_bucket_id" {
   description = "The ID of the export S3 bucket"
   value       = module.s3_buckets.export_bucket_id
 }
+
+output "redshift_workgroup_endpoint" {
+  value = module.redshift_serverless.redshift_workgroup_endpoint
+}
