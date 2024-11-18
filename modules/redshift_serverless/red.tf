@@ -27,16 +27,16 @@ resource "aws_redshiftserverless_workgroup" "redshift_workgroup" {
   subnet_ids = [aws_subnet.redshift_subnet.id]
 }
 
-resource "aws_security_group" "redshift_sg" {
-  name        = "redshift-sg"
-  description = "Security group for Redshift"
-  vpc_id      = var.vpc_id
-}
+# resource "aws_security_group" "redshift_sg" {
+#   name        = "redshift-sg"
+#   description = "Security group for Redshift"
+#   vpc_id      = var.vpc_id
+# }
 
-resource "aws_subnet" "redshift_subnet" {
-  vpc_id            = var.vpc_id
-  cidr_block        = "10.0.0.0/24"  # Adjust as needed
-}
+# resource "aws_subnet" "redshift_subnet" {
+#   vpc_id            = var.vpc_id
+#   cidr_block        = "10.0.0.0/24"  # Adjust as needed
+# }
 
 resource "aws_redshiftserverless_endpoint" "redshift_endpoint" {
   workgroup_name = aws_redshiftserverless_workgroup.redshift_workgroup.workgroup_name
@@ -78,4 +78,45 @@ resource "aws_iam_policy" "redshift_s3_policy" {
 resource "aws_iam_role_policy_attachment" "redshift_s3_attach" {
   policy_arn = aws_iam_policy.redshift_s3_policy.arn
   role       = aws_iam_role.redshift_role.name
+}
+
+
+# Create VPC
+resource "aws_vpc" "redshift_vpc" {
+  cidr_block = "10.0.0.0/16"  # Adjust as needed
+  enable_dns_support = true
+  enable_dns_hostnames = true
+}
+
+# Create private subnet for Redshift
+resource "aws_subnet" "redshift_subnet_private" {
+  vpc_id                  = aws_vpc.redshift_vpc.id
+  cidr_block              = "10.0.1.0/24"  # Adjust as needed
+  availability_zone       = "us-east-1a"  # Adjust as needed
+  map_public_ip_on_launch = false
+}
+
+# Create public subnet for Redshift
+resource "aws_subnet" "redshift_subnet_public" {
+  vpc_id                  = aws_vpc.redshift_vpc.id
+  cidr_block              = "10.0.2.0/24"  # Adjust as needed
+  availability_zone       = "us-east-1a"  # Adjust as needed
+  map_public_ip_on_launch = true
+}
+
+# Create Security Group for Redshift
+resource "aws_security_group" "redshift_sg" {
+  name        = "redshift-sg"
+  description = "Security group for Redshift"
+  vpc_id      = aws_vpc.redshift_vpc.id
+}
+
+# Security Group Rule for Redshift (Ingress)
+resource "aws_security_group_rule" "redshift_ingress" {
+  security_group_id = aws_security_group.redshift_sg.id
+  type              = "ingress"
+  from_port         = 5439  # Redshift default port
+  to_port           = 5439
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]  # Adjust based on your security needs
 }
