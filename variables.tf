@@ -23,32 +23,29 @@ variable "export_bucket_name" {
 
 
 
-variable "vpc_id" {
-  description = "The VPC ID where Redshift will be deployed"
-  type        = string
-}
+# variables.tf (Root Module)
 
-variable "subnet_ids" {
-  description = "List of subnet IDs for Redshift deployment"
-  type        = list(string)
-}
-
-variable "security_group_ids" {
-  description = "List of security group IDs for Redshift"
-  type        = list(string)
-}
-
+# Redshift Database Name
 variable "redshift_db_name" {
   description = "The name of the Redshift database"
   type        = string
 }
 
+# Redshift Master Username
 variable "redshift_master_username" {
   description = "Master username for the Redshift database"
   type        = string
 }
 
+# Redshift Master Password
 variable "redshift_master_password" {
   description = "Master password for the Redshift database"
   type        = string
+}
+
+# Base Capacity for Redshift Serverless Workgroup
+variable "base_capacity" {
+  description = "Base capacity for Redshift Serverless"
+  type        = number
+  default     = 0
 }

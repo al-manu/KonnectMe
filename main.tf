@@ -14,54 +14,28 @@ module "s3_buckets" {
 
 # Module to deploy Redshift Serverless
 
+# main.tf (Root Module)
+
+# Call the VPC module to create the VPC, subnets, and security group
+module "vpc" {
+  source = "./modules/vpc"
+
+  cidr_block            = "10.0.0.0/16"
+  public_subnet_cidr    = "10.0.1.0/24"
+  private_subnet_cidr   = "10.0.2.0/24"
+  public_subnet_az      = "eu-central-1a"
+  private_subnet_az     = "eu-central-1b"
+}
+
+# Call the Redshift Serverless module to create Redshift resources
 module "redshift_serverless" {
-  source = "./modules/redshift_serverless"  # Path to the redshift_serverless module
+  source = "./modules/redshift_serverless"
 
   redshift_db_name         = var.redshift_db_name
   redshift_master_username = var.redshift_master_username
   redshift_master_password = var.redshift_master_password
-  vpc_id                   = aws_vpc.redshift_vpc.id  # VPC ID that is defined in the root module
-  subnet_ids               = [
-    aws_subnet.redshift_subnet_private.id,
-    aws_subnet.redshift_subnet_public.id
-  ]  # Subnet IDs defined in the root module
-  security_group_ids       = [aws_security_group.redshift_sg.id]  # Security group IDs defined in the root module
-  base_capacity            = 0  # Set for serverless
-}
-
-# Example of creating the VPC and subnets in the root module
-
-resource "aws_vpc" "redshift_vpc" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
-  enable_dns_hostnames = true
-}
-
-resource "aws_subnet" "redshift_subnet_private" {
-  vpc_id                  = aws_vpc.redshift_vpc.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = false
-}
-
-resource "aws_subnet" "redshift_subnet_public" {
-  vpc_id                  = aws_vpc.redshift_vpc.id
-  cidr_block              = "10.0.2.0/24"
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = true
-}
-
-resource "aws_security_group" "redshift_sg" {
-  name        = "redshift-sg"
-  description = "Security group for Redshift"
-  vpc_id      = aws_vpc.redshift_vpc.id
-}
-
-resource "aws_security_group_rule" "redshift_ingress" {
-  security_group_id = aws_security_group.redshift_sg.id
-  type              = "ingress"
-  from_port         = 5439  # Redshift default port
-  to_port           = 5439
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids               = [module.vpc.private_subnet_id, module.vpc.public_subnet_id]
+  security_group_ids       = [module.vpc.security_group_id]
+  base_capacity            = var.base_capacity
 }
