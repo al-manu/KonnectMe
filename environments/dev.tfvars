@@ -26,8 +26,8 @@ redshift_master_password = "MySecurePassword1234!"
 base_capacity            = 0  # Redshift Serverless minimal capacity
 # VPC and Networking Variables
 cidr_block            = "10.0.0.0/16"
-public_subnet_cidr    = "10.0.1.0/24"
-private_subnet_cidr   = "10.0.2.0/24"
+public_subnet_cidr    = "10.0.1.0/22"
+private_subnet_cidr   = "10.0.2.0/22"
 public_subnet_az      = "eu-central-1a"
 private_subnet_az     = "eu-central-1b"
 
