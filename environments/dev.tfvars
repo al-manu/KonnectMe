@@ -15,3 +15,8 @@ export_bucket_name = "dwh-dev-curated"
 
 # # Optionally add other variables for the S3 configuration (e.g., versioning, encryption)
 # enable_versioning = true  # Enable versioning for the buckets (recommended for production environments)
+
+
+redshift_db_name         = "myredshiftdb"
+redshift_master_username = "admin"
+redshift_master_password = "MySecurePassword123!"

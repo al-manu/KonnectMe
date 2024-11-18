@@ -17,9 +17,9 @@ module "s3_buckets" {
 module "redshift_serverless" {
   source = "./modules/redshift_serverless"  # Path to the redshift_serverless module
 
-  redshift_db_name         = "myredshiftdb"
-  redshift_master_username = "admin"
-  redshift_master_password = "MySecurePassword123!"
+  redshift_db_name         = var.redshift_db_name
+  redshift_master_username = var.redshift_master_username
+  redshift_master_password = var.redshift_master_password
   vpc_id                   = aws_vpc.redshift_vpc.id  # VPC ID that is defined in the root module
   subnet_ids               = [
     aws_subnet.redshift_subnet_private.id,
