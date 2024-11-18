@@ -30,4 +30,4 @@ private_subnet_az     = "eu-central-1b"
 redshift_db_name         = "mydevredshiftdb"
 redshift_master_username = "admin"
 redshift_master_password = "MySecurePassword123!"
-base_capacity            = 8  # Redshift Serverless minimal capacity
+base_capacity            = 0  # Redshift Serverless minimal capacity

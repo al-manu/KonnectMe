@@ -16,6 +16,7 @@ variable "redshift_master_username" {
 variable "redshift_master_password" {
   description = "Master password for the Redshift database"
   type        = string
+  sensitive   = true
 }
 
 # VPC and subnet IDs
