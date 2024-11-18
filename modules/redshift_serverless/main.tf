@@ -17,7 +17,7 @@ resource "aws_secretsmanager_secret_version" "redshift_credentials_version" {
 resource "aws_redshiftserverless_namespace" "redshift_namespace" {
   namespace_name = var.redshift_db_name
   db_name        = var.redshift_db_name
-  admin_username = var.redshift_master_username
+  # admin_username = var.redshift_master_username
   # admin_password is handled via Secrets Manager
 }
 
