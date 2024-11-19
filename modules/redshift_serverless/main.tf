@@ -82,7 +82,7 @@ resource "aws_redshiftserverless_namespace" "this" {
 resource "aws_redshiftserverless_workgroup" "this" {
   workgroup_name   = "example-workgroup"
   namespace_name   = aws_redshiftserverless_namespace.this.namespace_name
-  base_capacity    = 32
+  base_capacity    = 0
   enhanced_vpc_routing = true
   subnet_ids       = var.subnet_ids
   security_group_ids = var.security_group_ids
