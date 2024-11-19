@@ -40,6 +40,17 @@ jobs:
         with:
           terraform_version: 1.9.8  # Pin the Terraform version for consistent behavior
 
+      # Step A: Set up Python for Lambda testing (if necessary for your Lambda function)
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # Specify the Python version required for Lambda tests
+
+      - name: Create Lambda zip file
+        run: |
+          cd scripts/lambda 
+          zip s3_lambda_trigger_function.zip s3_lambda_trigger_function.py  # Lambda file path 
+
       # Configure AWS credentials using OIDC and assume the required role
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
