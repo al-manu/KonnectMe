@@ -68,5 +68,5 @@ module "redshift" {
 
 module "lambda_rotation" {
   source = "./modules/lambda_rotation"
-  secret_arn = module.secrets_manager.secret_arn
+  lambda_role_arn = module.secrets_manager.secret_arn
 }

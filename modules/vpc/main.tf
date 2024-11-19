@@ -81,14 +81,14 @@ resource "aws_security_group" "this" {
   }
 }
 
-output "vpc_id" {
-  value = aws_vpc.this.id
-}
+# output "vpc_id" {
+#   value = aws_vpc.this.id
+# }
 
-output "subnet_ids" {
-  value = aws_subnet.this[*].id
-}
+# output "subnet_ids" {
+#   value = aws_subnet.this[*].id
+# }
 
-output "security_group_ids" {
-  value = aws_security_group.this.id
-}
+# output "security_group_ids" {
+#   value = aws_security_group.this.id
+# }
