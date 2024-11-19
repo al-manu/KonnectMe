@@ -1,9 +1,5 @@
-variable "lambda_role_arn" {
-  description = "IAM role ARN for the Lambda function"
-  type        = string
-}
-
+# modules/lambda_rotation/variables.tf
 variable "secret_arn" {
-  description = "ARN of the Secrets Manager secret"
+  description = "The ARN of the Secrets Manager secret for the password."
   type        = string
 }

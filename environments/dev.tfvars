@@ -33,35 +33,49 @@ export_bucket_name = "dwh-dev-curated"
 
 # dev.tfvars
 
-# Redshift Serverless Configuration
-redshift_serverless_namespace = "dev-namespace"  # Redshift namespace name
-redshift_serverless_db_name   = "dev-db"          # Database name in Redshift Serverless
-redshift_serverless_workgroup = "dev-workgroup"    # Workgroup name for Redshift Serverless
-redshift_serverless_port      = 5439              # Port for Redshift (default is 5439)
-redshift_serverless_username  = "devuser"          # Username for the database
-redshift_serverless_password  = "devpassword"      # Initial password for Redshift user
-# redshift_serverless_node_type = "dc2.medium"        # Node type for the Redshift Serverless workgroup (example)
+# # Redshift Serverless Configuration
+# redshift_serverless_namespace = "dev-namespace"  # Redshift namespace name
+# redshift_serverless_db_name   = "dev-db"          # Database name in Redshift Serverless
+# redshift_serverless_workgroup = "dev-workgroup"    # Workgroup name for Redshift Serverless
+# redshift_serverless_port      = 5439              # Port for Redshift (default is 5439)
+# redshift_serverless_username  = "devuser"          # Username for the database
+# redshift_serverless_password  = "devpassword"      # Initial password for Redshift user
+# # redshift_serverless_node_type = "dc2.medium"        # Node type for the Redshift Serverless workgroup (example)
 
-# VPC Configuration
-vpc_cidr_block = "10.0.0.0/16"  # CIDR block for VPC in DEV environment
-subnet_ids = ["subnet-abc123", "subnet-def456"]  # Subnet IDs for Redshift Serverless cluster (ensure subnets are in different AZs)
+# # VPC Configuration
+# vpc_cidr_block = "10.0.0.0/16"  # CIDR block for VPC in DEV environment
+# subnet_ids = ["subnet-abc123", "subnet-def456"]  # Subnet IDs for Redshift Serverless cluster (ensure subnets are in different AZs)
 
-# Secrets Manager Configuration (for storing Redshift credentials)
-redshift_secret_name = "dev-redshift-credentials"  # Name of the secret to store in Secrets Manager
-redshift_secret_arn  = "arn:aws:secretsmanager:us-west-2:123456789012:secret:dev-redshift-credentials"
+# # Secrets Manager Configuration (for storing Redshift credentials)
+# redshift_secret_name = "dev-redshift-credentials"  # Name of the secret to store in Secrets Manager
+# redshift_secret_arn  = "arn:aws:secretsmanager:us-west-2:123456789012:secret:dev-redshift-credentials"
 
-# Redshift IAM Role (IAM Role for Redshift to access other AWS services like Secrets Manager)
-redshift_iam_role_name = "dev-redshift-iam-role"  # IAM Role name for Redshift
+# # Redshift IAM Role (IAM Role for Redshift to access other AWS services like Secrets Manager)
+# redshift_iam_role_name = "dev-redshift-iam-role"  # IAM Role name for Redshift
 
-# CloudWatch Logging for Redshift Serverless (Optional, for monitoring)
-cloudwatch_log_group_name = "dev-redshift-logs"  # CloudWatch Logs group name for Redshift
+# # CloudWatch Logging for Redshift Serverless (Optional, for monitoring)
+# cloudwatch_log_group_name = "dev-redshift-logs"  # CloudWatch Logs group name for Redshift
 
-# Lambda Role and Lambda Function for password rotation (if applicable)
-lambda_role_arn = "arn:aws:iam::123456789012:role/lambda-execution-role"
-lambda_function_arn = "arn:aws:lambda:us-west-2:123456789012:function:redshift-password-rotation"
+# # Lambda Role and Lambda Function for password rotation (if applicable)
+# lambda_role_arn = "arn:aws:iam::123456789012:role/lambda-execution-role"
+# lambda_function_arn = "arn:aws:lambda:us-west-2:123456789012:function:redshift-password-rotation"
 
-# S3 Bucket for Terraform State (if using remote state)
-terraform_state_bucket = "dev-terraform-state-bucket"  # S3 bucket name for storing the Terraform state file
+# # S3 Bucket for Terraform State (if using remote state)
+# terraform_state_bucket = "dev-terraform-state-bucket"  # S3 bucket name for storing the Terraform state file
 
-# AWS Region (typically set per environment)
-aws_region = "eu-central-1"  # AWS region for the DEV environment
+# # AWS Region (typically set per environment)
+# aws_region = "eu-central-1"  # AWS region for the DEV environment
+
+
+
+# dev.tfvars
+cidr_block = "10.0.0.0/16"
+subnet_cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
+availability_zones = ["eu-central-1a", "eu-central-1b"]
+namespace_name = "dev-namespace"
+db_name = "devdb"
+admin_username = "admin"
+admin_password = "supersecretpassword"  # Ensure this is securely managed
+base_capacity = 0
+subnet_ids = ["subnet-xyz", "subnet-abc"]
+security_group_ids = ["sg-xyz"]

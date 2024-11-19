@@ -1,59 +1,45 @@
-# variables.tf (Root Level)
-
-# S3 bucket names for different purposes
-variable "in_bucket_name" {
-  description = "Name for the input S3 bucket"
+# variables.tf (Root)
+variable "aws_region" {
+  description = "The AWS region to deploy resources."
   type        = string
 }
 
-variable "out_bucket_name" {
-  description = "Name for the output S3 bucket"
+variable "cidr_block" {
+  description = "CIDR block for the VPC."
   type        = string
 }
 
-variable "tmp_bucket_name" {
-  description = "Name for the temporary S3 bucket"
+variable "subnet_cidr_blocks" {
+  description = "List of CIDR blocks for the subnets."
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "List of availability zones for the subnets."
+  type        = list(string)
+}
+
+variable "namespace_name" {
+  description = "The Redshift namespace name."
   type        = string
 }
 
-variable "export_bucket_name" {
-  description = "Name for the export S3 bucket"
+variable "db_name" {
+  description = "The Redshift database name."
   type        = string
 }
 
-
-
-# variables.tf (Root Module)
-
-# Redshift Database Name
-variable "redshift_db_name" {
-  description = "The name of the Redshift database"
+variable "admin_username" {
+  description = "The username for the Redshift database."
   type        = string
 }
 
-# Redshift Master Username
-variable "redshift_master_username" {
-  description = "Master username for the Redshift database"
-  type        = string
-}
-
-# Redshift Master Password
-variable "redshift_master_password" {
-  description = "Master password for the Redshift database"
-  type        = string
-}
-
-# Base Capacity for Redshift Serverless Workgroup
 variable "base_capacity" {
-  description = "Base capacity for Redshift Serverless"
+  description = "The base capacity for Redshift serverless workgroup."
   type        = number
-  default     = 0
 }
 
-
-
-variable "region" {
-  type = string
-  description = "AWS region"
-  # default = "us-west-2"
+variable "secret_value" {
+  description = "Admin password for Redshift database."
+  type        = string
 }

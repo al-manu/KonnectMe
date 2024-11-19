@@ -1,59 +1,35 @@
-# # modules/redshift_serverless/variables.tf
+# modules/redshift/variables.tf
+variable "namespace_name" {
+  description = "The name of the Redshift namespace."
+  type        = string
+}
 
-# # The name of the Redshift database
-# variable "redshift_db_name" {
-#   description = "The name of the Redshift database"
-#   type        = string
-# }
+variable "db_name" {
+  description = "The name of the Redshift database."
+  type        = string
+}
 
-# # Redshift master username
-# variable "redshift_master_username" {
-#   description = "Master username for the Redshift database"
-#   type        = string
-# }
+variable "admin_username" {
+  description = "The username for the Redshift admin."
+  type        = string
+}
 
-# # Redshift master password
-# variable "redshift_master_password" {
-#   description = "Master password for the Redshift database"
-#   type        = string
-#   sensitive   = true
-# }
+variable "admin_password" {
+  description = "The password for the Redshift admin."
+  type        = string
+}
 
-# # VPC and subnet IDs
-# variable "vpc_id" {
-#   description = "The ID of the VPC where Redshift will be deployed"
-#   type        = string
-# }
-
-# variable "subnet_ids" {
-#   description = "List of subnet IDs where Redshift will be deployed"
-#   type        = list(string)
-# }
-
-# variable "security_group_ids" {
-#   description = "List of security group IDs associated with Redshift"
-#   type        = list(string)
-# }
-
-# # Redshift serverless base capacity
-# variable "base_capacity" {
-#   description = "Base capacity for Redshift Serverless workgroup"
-#   type        = number
-#   default     = 0
-# }
-
+variable "base_capacity" {
+  description = "The base capacity of the Redshift workgroup."
+  type        = number
+}
 
 variable "subnet_ids" {
-  description = "The subnet IDs for Redshift"
+  description = "The list of subnet IDs for the Redshift workgroup."
   type        = list(string)
 }
 
 variable "security_group_ids" {
-  description = "The security group IDs for Redshift"
+  description = "The list of security group IDs for the Redshift workgroup."
   type        = list(string)
-}
-
-variable "admin_password" {
-  description = "The admin password for Redshift"
-  type        = string
 }
