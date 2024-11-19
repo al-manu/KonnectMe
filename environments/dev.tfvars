@@ -69,13 +69,13 @@ aws_region = "eu-central-1"  # AWS region for the DEV environment
 
 
 # dev.tfvars
-cidr_block = "10.0.0.0/16"
-subnet_cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
-availability_zones = ["eu-central-1a", "eu-central-1b"]
-namespace_name = "dev-namespace"
-db_name = "devdb"
-admin_username = "admin"
-admin_password = "supersecretpassword"  # Ensure this is securely managed
-base_capacity = 0
-subnet_ids = ["subnet-xyz", "subnet-abc"]
-security_group_ids = ["sg-xyz"]
+# cidr_block = "10.0.0.0/16"
+# subnet_cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
+# availability_zones = ["eu-central-1a", "eu-central-1b"]
+# namespace_name = "dev-namespace"
+# db_name = "devdb"
+# admin_username = "admin"
+# admin_password = "supersecretpassword"  # Ensure this is securely managed
+# base_capacity = 0
+# subnet_ids = ["subnet-xyz", "subnet-abc"]
+# security_group_ids = ["sg-xyz"]
