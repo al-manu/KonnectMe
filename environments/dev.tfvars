@@ -64,7 +64,7 @@ export_bucket_name = "dwh-dev-curated"
 # terraform_state_bucket = "dev-terraform-state-bucket"  # S3 bucket name for storing the Terraform state file
 
 # # AWS Region (typically set per environment)
-# aws_region = "eu-central-1"  # AWS region for the DEV environment
+aws_region = "eu-central-1"  # AWS region for the DEV environment
 
 
 
