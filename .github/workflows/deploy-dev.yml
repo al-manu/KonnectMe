@@ -49,7 +49,7 @@ jobs:
       - name: Create Lambda zip file
         run: |
           cd scripts/lambda 
-          zip s3_lambda_trigger_function.zip s3_lambda_trigger_function.py  # Lambda file path 
+          zip lambda.zip lambda_rotation.py  # Lambda file path 
 
       # Configure AWS credentials using OIDC and assume the required role
       - name: Configure AWS credentials
