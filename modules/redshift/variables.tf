@@ -107,10 +107,10 @@ variable "admin_username" {
   type        = string
 }
 
-variable "admin_password" {
-  description = "Admin password for the Redshift Serverless namespace"
-  type        = string
-}
+# variable "admin_password" {
+#   description = "Admin password for the Redshift Serverless namespace"
+#   type        = string
+# }
 
 # variable "vpc_security_group_id" {
 #   description = "The security group ID for the Redshift Serverless workgroup"
