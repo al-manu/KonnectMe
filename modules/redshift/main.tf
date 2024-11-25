@@ -220,7 +220,7 @@ resource "aws_security_group" "redshift" {
 
 resource "aws_redshiftserverless_namespace" "redshift_namespace" {
   namespace_name = var.namespace_name
-  admin_username = var.admin_username
+  admin_username = jsondecode(aws_secretsmanager_secret_version.db_credentials_version.secret_string)["username"]
   # Fetch password from the Secrets Manager Secret
   # secret_arn     = aws_secretsmanager_secret.db_credentials.arn  # Reference the secret ARN for password
   # Tags for the namespace
