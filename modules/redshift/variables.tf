@@ -99,3 +99,20 @@ variable "namespace_name" {
   description = "Redshift namespace name"
   type        = string
 }
+
+# Namespace and Workgroup for Redshift Serverless
+
+variable "admin_username" {
+  description = "Admin username for the Redshift Serverless namespace"
+  type        = string
+}
+
+variable "admin_password" {
+  description = "Admin password for the Redshift Serverless namespace"
+  type        = string
+}
+
+variable "vpc_security_group_id" {
+  description = "The security group ID for the Redshift Serverless workgroup"
+  type        = string
+}

@@ -178,18 +178,46 @@ resource "aws_security_group" "redshift" {
 
 
 
-# Define the Redshift Serverless Workgroup
-# Create the Redshift Serverless workgroup
-resource "aws_redshiftserverless_workgroup" "redshift_serverless" {
-  workgroup_name        = var.workgroup_name
-  base_capacity         = var.base_capacity
-  enhanced_vpc_routing = var.enhanced_vpc_routing
-  namespace_name        = var.namespace_name
-  # log_exports           = var.log_exports # Correct usage of log_exports as a list of strings
+# # Define the Redshift Serverless Workgroup
+# # Create the Redshift Serverless workgroup
+# resource "aws_redshiftserverless_workgroup" "redshift_serverless" {
+#   workgroup_name        = var.workgroup_name
+#   base_capacity         = var.base_capacity
+#   enhanced_vpc_routing = var.enhanced_vpc_routing
+#   namespace_name        = var.namespace_name
+#   # log_exports           = var.log_exports # Correct usage of log_exports as a list of strings
 
-  # Attach security groups (this should be vpc_security_group_ids, not vpc_security_group_id)
-  # vpc_security_group_ids = [aws_security_group.redshift.id]  # Attach VPC security group(s)
+#   # Attach security groups (this should be vpc_security_group_ids, not vpc_security_group_id)
+#   # vpc_security_group_ids = [aws_security_group.redshift.id]  # Attach VPC security group(s)
 
-  tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
+#   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
+# }
+
+# ------------------------------
+# Redshift Serverless Namespace
+# ------------------------------
+
+resource "aws_redshiftserverless_namespace" "redshift_namespace" {
+  namespace_name = var.namespace_name
+  admin_username = var.admin_username
+  secret_arn     = aws_secretsmanager_secret.db_credentials.arn  # Use Secrets Manager ARN for password
+
+  # Tags for the namespace
+  tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-namespace" })
 }
 
+# ------------------------------
+# Redshift Serverless Workgroup
+# ------------------------------
+
+resource "aws_redshiftserverless_workgroup" "redshift_serverless" {
+  workgroup_name         = var.workgroup_name
+  base_capacity          = var.base_capacity
+  enhanced_vpc_routing  = var.enhanced_vpc_routing
+  namespace_name        = aws_redshiftserverless_namespace.redshift_namespace.namespace_name
+  # vpc_security_group_ids = [aws_security_group.redshift.id]
+
+  tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
+
+  depends_on = [aws_redshiftserverless_namespace.redshift_namespace]  # Ensure namespace is created first
+}

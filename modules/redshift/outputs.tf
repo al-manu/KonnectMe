@@ -19,3 +19,9 @@ output "redshift_role_arn" {
 output "redshift_endpoint" {
   value = aws_redshiftserverless_workgroup.redshift_serverless.endpoint
 }
+
+# Outputs for Redshift Namespace and Workgroup
+output "redshift_namespace_name" {
+  description = "The name of the Redshift Serverless namespace"
+  value       = aws_redshiftserverless_namespace.redshift_namespace.namespace_name
+}
