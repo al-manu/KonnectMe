@@ -101,7 +101,7 @@ db_port          = 5439                         # Default Redshift port
 db_name          = "dev_database"               # Redshift database name
 
 # IAM Role ARN (to be used in Redshift and other services)
-
+iam_role_name = "redshift-role-for-project"
 # VPC Configuration
 vpc_cidr_block   = "10.0.0.0/16"                # CIDR block for the VPC
 subnet_cidr_block = "10.0.1.0/24"               # Subnet CIDR block (can be expanded for more subnets)
