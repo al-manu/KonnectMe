@@ -182,10 +182,10 @@ resource "aws_redshiftserverless_workgroup" "redshift_serverless" {
   base_capacity         = var.base_capacity
   enhanced_vpc_routing = var.enhanced_vpc_routing
   namespace_name        = var.namespace_name
-  log_exports           = var.log_exports # Correct usage of log_exports as a list of strings
+  # log_exports           = var.log_exports # Correct usage of log_exports as a list of strings
 
   # Attach security groups (this should be vpc_security_group_ids, not vpc_security_group_id)
-  vpc_security_group_ids = [aws_security_group.redshift.id]  # Attach VPC security group(s)
+  # vpc_security_group_ids = [aws_security_group.redshift.id]  # Attach VPC security group(s)
 
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
 }
