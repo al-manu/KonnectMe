@@ -46,18 +46,18 @@
 
 
 # Outputs
-output "vpc_id" {
-  value = module.redshift.vpc_id
-}
+# output "vpc_id" {
+#   value = module.redshift.vpc_id
+# }
 
-output "private_subnet_ids" {
-  value = module.redshift.private_subnet_ids
-}
+# output "private_subnet_ids" {
+#   value = module.redshift.private_subnet_ids
+# }
 
-output "redshift_role_arn" {
-  value = module.redshift.redshift_role_arn
-}
+# output "redshift_role_arn" {
+#   value = module.redshift.redshift_role_arn
+# }
 
-output "redshift_endpoint" {
-  value = module.redshift.redshift_endpoint
-}
+# output "redshift_endpoint" {
+#   value = module.redshift.redshift_endpoint
+# }
