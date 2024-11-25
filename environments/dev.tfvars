@@ -112,6 +112,7 @@ db_name          = "mydatabase"  # Database name to create in Redshift
 # availability_zone    = "eu-central-1a"  # Availability Zone for your subnets
 # vpc_security_group_ids = ["sg-xxxxxxxx"]  # Security group for VPC (this is the Security Group ID that Redshift will use)
 region              = "eu-central-1"  # AWS region for deployment
+vpc_cidr_block      = "10.0.0.0/16"  # CIDR block for the VPC
 private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]  # Private subnets CIDRs
 availability_zones  = ["eu-central-1a", "eu-central-1b"]  # Availability zones
 
