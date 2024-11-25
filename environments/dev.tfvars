@@ -101,7 +101,6 @@ db_port          = 5439                         # Default Redshift port
 db_name          = "dev_database"               # Redshift database name
 
 # IAM Role ARN (to be used in Redshift and other services)
-iam_role_arn     = "arn:aws:iam::your-account-id:role/your-iam-role"  # Replace with your IAM role ARN for Redshift
 
 # VPC Configuration
 vpc_cidr_block   = "10.0.0.0/16"                # CIDR block for the VPC
