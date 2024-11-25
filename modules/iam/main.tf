@@ -1,39 +1,45 @@
-# modules/iam/main.tf
-resource "aws_iam_role" "lambda_execution_role" {
-  name               = "lambda_execution_role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+# Create IAM Role for Redshift Serverless
+resource "aws_iam_role" "redshift_role" {
+  name               = "${var.project_name}-redshift-role"
+  assume_role_policy = data.aws_iam_policy_document.redshift_assume_role_policy.json
+
+  tags = var.tags
 }
 
-data "aws_iam_policy_document" "lambda_assume_role_policy" {
+# Trust Policy for Redshift to Assume Role
+data "aws_iam_policy_document" "redshift_assume_role_policy" {
   statement {
-    actions   = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"]
     principals {
       type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+      identifiers = ["redshift-serverless.amazonaws.com"]
     }
   }
 }
 
-resource "aws_iam_policy" "lambda_secretsmanager_policy" {
-  name        = "lambda_secretsmanager_policy"
-  description = "Policy to allow Lambda to interact with Secrets Manager"
-  policy      = data.aws_iam_policy_document.lambda_secretsmanager_policy.json
+# Attach Policy to Allow S3 Access for Redshift
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "${var.project_name}-s3-access-policy"
+  description = "Policy to allow Redshift to access S3"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["s3:GetObject", "s3:ListBucket"]
+        Effect   = "Allow"
+        Resource = var.s3_bucket_arns
+      }
+    ]
+  })
 }
 
-data "aws_iam_policy_document" "lambda_secretsmanager_policy" {
-  statement {
-    actions   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue"]
-    resources = [aws_secretsmanager_secret.redshift_admin_password.arn]
-  }
+resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
+  role       = aws_iam_role.redshift_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
 }
 
-resource "aws_iam_policy_attachment" "lambda_secretsmanager_policy_attachment" {
-  name       = "lambda-secretsmanager-policy-attachment"
-  policy_arn = aws_iam_policy.lambda_secretsmanager_policy.arn
-  roles      = [aws_iam_role.lambda_execution_role.name]
-}
-
-output "lambda_role_arn" {
-  description = "The ARN of the Lambda execution role."
-  value       = aws_iam_role.lambda_execution_role.arn
+# Attach AWS Managed Glue Policy for Redshift Integration
+resource "aws_iam_role_policy_attachment" "attach_glue_policy" {
+  role       = aws_iam_role.redshift_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }

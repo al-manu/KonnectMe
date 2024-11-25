@@ -79,3 +79,43 @@ aws_region = "eu-central-1"  # AWS region for the DEV environment
 # base_capacity = 0
 # subnet_ids = ["subnet-xyz", "subnet-abc"]
 # security_group_ids = ["sg-xyz"]
+
+# dev.tfvars - Environment-specific variables for the development environment
+
+# Redshift Serverless Configuration
+namespace_name   = "dev-redshift-namespace"      # Name of the Redshift Serverless namespace
+workgroup_name   = "dev-redshift-workgroup"      # Name of the Redshift Serverless workgroup
+base_capacity    = 0                           # Base capacity for the Redshift workgroup
+enhanced_vpc_routing = true                     # Enable enhanced VPC routing (if needed)
+log_exports      = ["userlog"]                  # Log exports (optional, if you want to enable query logging)
+tags             = {
+  "Environment"   = "dev"
+  "Project"       = "KonnectMe"
+}
+
+# Database Credentials - Used in Secrets Manager
+db_username      = "admin"                      # Database username
+db_password      = "DevStrongPassword123"       # Initial database password (to be stored securely in Secrets Manager)
+db_host          = "redshift-cluster-name"      # Redshift endpoint host (can be updated after resource creation)
+db_port          = 5439                         # Default Redshift port
+db_name          = "dev_database"               # Redshift database name
+
+# IAM Role ARN (to be used in Redshift and other services)
+iam_role_arn     = "arn:aws:iam::your-account-id:role/your-iam-role"  # Replace with your IAM role ARN for Redshift
+
+# VPC Configuration
+vpc_cidr_block   = "10.0.0.0/16"                # CIDR block for the VPC
+subnet_cidr_block = "10.0.1.0/24"               # Subnet CIDR block (can be expanded for more subnets)
+availability_zone = "eu-central-1a"                 # Availability Zone for the subnet
+
+# Security Groups
+vpc_security_group_name = "dev-vpc-sg"          # Name for VPC security group
+allowed_ip_range       = "0.0.0.0/0"            # Set this to your allowed IP range, ideally limit to trusted IPs
+
+# Secrets Manager Configuration
+secret_name       = "redshift-credentials"       # Name of the secret in Secrets Manager
+secret_description = "Redshift credentials for development environment"  # Description for the secret
+
+# Lambda Rotation (if needed for password rotation)
+lambda_function_name = "redshift-password-rotation"  # Name of the Lambda function for password rotation
+rotation_schedule   = "rate(30 days)"               # Rotation schedule for password (optional)

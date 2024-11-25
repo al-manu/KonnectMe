@@ -1,35 +1,56 @@
-# modules/redshift/variables.tf
+# Namespace Variables
 variable "namespace_name" {
-  description = "The name of the Redshift namespace."
-  type        = string
-}
-
-variable "db_name" {
-  description = "The name of the Redshift database."
+  description = "The name of the Redshift namespace"
   type        = string
 }
 
 variable "admin_username" {
-  description = "The username for the Redshift admin."
+  description = "Admin username for Redshift"
   type        = string
 }
 
 variable "admin_password" {
-  description = "The password for the Redshift admin."
+  description = "Admin password for Redshift"
+  type        = string
+  sensitive   = true
+}
+
+variable "log_exports" {
+  description = "Logs to export (e.g., userlog, connectionlog, useractivitylog)"
+  type        = list(string)
+  default     = ["userlog", "connectionlog", "useractivitylog"]
+}
+
+# Workgroup Variables
+variable "workgroup_name" {
+  description = "The name of the Redshift workgroup"
   type        = string
 }
 
 variable "base_capacity" {
-  description = "The base capacity of the Redshift workgroup."
+  description = "Compute capacity in Redshift Processing Units (RPUs)"
   type        = number
+  default     = 8
 }
 
 variable "subnet_ids" {
-  description = "The list of subnet IDs for the Redshift workgroup."
+  description = "Subnets for the Redshift workgroup"
   type        = list(string)
 }
 
 variable "security_group_ids" {
-  description = "The list of security group IDs for the Redshift workgroup."
+  description = "Security groups for the Redshift workgroup"
   type        = list(string)
+}
+
+variable "iam_roles" {
+  description = "IAM roles for Redshift to access other AWS services (e.g., S3)"
+  type        = list(string)
+  default     = []
+}
+
+variable "tags" {
+  description = "Tags to apply to the resources"
+  type        = map(string)
+  default     = {}
 }
