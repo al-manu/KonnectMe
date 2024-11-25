@@ -75,21 +75,11 @@ module "redshift" {
   enhanced_vpc_routing  = var.enhanced_vpc_routing
   log_exports           = var.log_exports
   namespace_name        = var.namespace_name
+
+    # Pass admin username and secret_arn for password management
+  admin_username        = var.db_username    # Assuming db_username is the admin username
+  secret_arn            = aws_secretsmanager_secret.db_credentials.arn  # Use the secret ARN for password
+  vpc_security_group_id = aws_security_group.redshift.id  # Security group for Redshift
+  
 }
 
-# Outputs
-output "vpc_id" {
-  value = module.redshift.vpc_id
-}
-
-output "private_subnet_ids" {
-  value = module.redshift.private_subnet_ids
-}
-
-output "redshift_role_arn" {
-  value = module.redshift.redshift_role_arn
-}
-
-output "redshift_endpoint" {
-  value = module.redshift.redshift_endpoint
-}

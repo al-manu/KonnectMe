@@ -112,7 +112,12 @@ variable "admin_password" {
   type        = string
 }
 
-variable "vpc_security_group_id" {
-  description = "The security group ID for the Redshift Serverless workgroup"
+# variable "vpc_security_group_id" {
+#   description = "The security group ID for the Redshift Serverless workgroup"
+#   type        = string
+# }
+
+variable "secret_arn" {
+  description = "The ARN of the Secrets Manager secret containing the admin password"
   type        = string
 }
