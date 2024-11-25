@@ -65,21 +65,8 @@ variable "iam_role_name" {
   type        = string
 }
 
-# VPC Configuration
-variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC"
-  type        = string
-}
 
-variable "subnet_cidr_block" {
-  description = "CIDR block for the subnet"
-  type        = string
-}
 
-variable "availability_zone" {
-  description = "Availability zone for the subnet"
-  type        = string
-}
 
 # Secrets Manager Configuration
 variable "secret_name" {
@@ -106,3 +93,38 @@ variable "tags" {
     "Project"     = "KonnectMe"
   }
 }
+
+
+
+# VPC Configuration
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "private_subnet_cidrs" {
+  description = "List of CIDR blocks for private subnets"
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+}
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+}
+
+variable "project_name" {
+  description = "The name of the project, used for tagging"
+  type        = string
+}
+
+variable "allowed_ips" {
+  description = "The IP addresses allowed to connect to Redshift"
+  type        = list(string)
+}
+
+# IAM, Redshift, and Secrets Manager related variables (continue as before)
