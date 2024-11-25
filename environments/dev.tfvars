@@ -142,7 +142,7 @@ tags                = { "Environment" = "dev", "Project" = "redshift-project" }
 project_name        = "redshift-project"
 allowed_ips         = ["192.168.1.0/24", "10.0.0.0/16"]
 iam_role_name       = "redshift-iam-role"
-secret_name         = "redshift-db-credentials"
+secret_name         = "redshift-db-credentials-testing"
 secret_description  = "Redshift database credentials"
 db_username         = "admin"
 db_password         = "SuperSecurePassword123"
