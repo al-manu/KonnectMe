@@ -195,13 +195,13 @@ resource "aws_security_group" "redshift" {
 
 # ------------------------------
 # Redshift Serverless Namespace
-# ------------------------------
+# # ------------------------------
 
 resource "aws_redshiftserverless_namespace" "redshift_namespace" {
   namespace_name = var.namespace_name
   admin_username = var.admin_username
-  secret_arn     = var.secret_arn   # Use Secrets Manager ARN for password
-
+  # Fetch password from the Secrets Manager Secret
+  admin_password = jsondecode(aws_secretsmanager_secret_version.db_credentials_version.secret_string)["password"]
   # Tags for the namespace
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-namespace" })
 }
