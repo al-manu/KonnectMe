@@ -129,6 +129,27 @@ resource "aws_iam_role" "redshift_role" {
 }
 
 
+resource "aws_iam_policy" "redshift_secret_access" {
+  name        = "RedshiftSecretAccess"
+  description = "Policy to allow Redshift to access secrets"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.db_credentials.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "redshift_role_secret_access" {
+  policy_arn = aws_iam_policy.redshift_secret_access.arn
+  role       = aws_iam_role.redshift_role.name
+}
+
 
 
 # ------------------------
@@ -201,7 +222,7 @@ resource "aws_redshiftserverless_namespace" "redshift_namespace" {
   namespace_name = var.namespace_name
   admin_username = var.admin_username
   # Fetch password from the Secrets Manager Secret
-  secret_arn     = aws_secretsmanager_secret.db_credentials.arn  # Reference the secret ARN for password
+  # secret_arn     = aws_secretsmanager_secret.db_credentials.arn  # Reference the secret ARN for password
   # Tags for the namespace
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-namespace" })
 }
