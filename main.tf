@@ -77,7 +77,7 @@ module "redshift" {
   namespace_name        = var.namespace_name
 
     # Pass admin username and secret_arn for password management
-  admin_username        = var.db_username    # Assuming db_username is the admin username
+  # admin_username        = var.db_username    # Assuming db_username is the admin username
   # secret_arn            = aws_secretsmanager_secret.db_credentials.arn  # Use the secret ARN for password
   # vpc_security_group_id = aws_security_group.redshift.id  # Security group for Redshift
   

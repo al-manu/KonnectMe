@@ -102,10 +102,10 @@ variable "namespace_name" {
 
 # Namespace and Workgroup for Redshift Serverless
 
-variable "admin_username" {
-  description = "Admin username for the Redshift Serverless namespace"
-  type        = string
-}
+# variable "admin_username" {
+#   description = "Admin username for the Redshift Serverless namespace"
+#   type        = string
+# }
 
 # variable "admin_password" {
 #   description = "Admin password for the Redshift Serverless namespace"
