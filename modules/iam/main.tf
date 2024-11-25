@@ -1,20 +1,21 @@
 # Create IAM Role for Redshift Serverless
 resource "aws_iam_role" "redshift_role" {
-  name               = "${var.project_name}-redshift-role"
-  assume_role_policy = data.aws_iam_policy_document.redshift_assume_role_policy.json
+  name = var.iam_role_name  # This should reference the value provided in the dev.tfvars file
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "redshift.amazonaws.com"
+        }
+        Effect   = "Allow"
+        Sid      = ""
+      },
+    ]
+  })
 
   tags = var.tags
-}
-
-# Trust Policy for Redshift to Assume Role
-data "aws_iam_policy_document" "redshift_assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["redshift-serverless.amazonaws.com"]
-    }
-  }
 }
 
 # Attach Policy to Allow S3 Access for Redshift

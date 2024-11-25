@@ -14,3 +14,8 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "iam_role_name" {
+  description = "IAM role name to be used for Redshift"
+  type        = string
+}
