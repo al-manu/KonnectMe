@@ -112,11 +112,6 @@ variable "availability_zones" {
   type        = list(string)
 }
 
-variable "tags" {
-  description = "Tags to apply to resources"
-  type        = map(string)
-}
-
 variable "project_name" {
   description = "The name of the project, used for tagging"
   type        = string
