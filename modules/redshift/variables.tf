@@ -117,7 +117,7 @@ variable "admin_username" {
 #   type        = string
 # }
 
-variable "secret_arn" {
-  description = "The ARN of the Secrets Manager secret containing the admin password"
-  type        = string
-}
+# variable "secret_arn" {
+#   description = "The ARN of the Secrets Manager secret containing the admin password"
+#   type        = string
+# }
