@@ -175,6 +175,9 @@ resource "aws_security_group" "redshift" {
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-sg" })
 }
 
+
+
+
 # Define the Redshift Serverless Workgroup
 # Create the Redshift Serverless workgroup
 resource "aws_redshiftserverless_workgroup" "redshift_serverless" {
