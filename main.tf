@@ -1,46 +1,24 @@
-# # Define the module for creating S3 buckets
-# module "s3_buckets" {
-#   source = "./modules/S3"  # Path to the S3 module
-  
-#   # Pass the required variables to the module (from dev.tfvars, prod.tfvars, etc.)
-#   in_bucket_name     = var.in_bucket_name
-#   out_bucket_name    = var.out_bucket_name
-#   tmp_bucket_name    = var.tmp_bucket_name
-#   export_bucket_name = var.export_bucket_name
-# }
-
-
-
-
-# # Module to deploy Redshift Serverless
-
-# # main.tf (Root Module)
-# main.tf - Root configuration for your project
-
-# provider "aws" {
-#   region = "eu-central-1"  # Specify the AWS region you want to deploy your resources to
-# }
-
-# VPC Module
-# main.tf - Root configuration for your project
 
 provider "aws" {
   region = var.region  # AWS region defined in variables.tf
 }
 
 # VPC Module - Ensure VPC is created first
+# VPC Module - Ensure VPC is created first
 module "vpc" {
   source             = "./modules/vpc"
-  vpc_cidr_block     = var.vpc_cidr_block
-  subnet_cidr_block  = var.subnet_cidr_block
-  availability_zone  = var.availability_zone
+  vpc_cidr           = var.vpc_cidr_block
+  private_subnet_cidrs = var.private_subnet_cidrs
+  availability_zones = var.availability_zones
   tags               = var.tags
+  project_name       = var.project_name
+  allowed_ips        = var.allowed_ips
 }
-
 # IAM Module - Role for Redshift
 module "iam" {
   source        = "./modules/iam"
   iam_role_name = var.iam_role_name
+  tags               = var.tags
 }
 
 # Secrets Manager Module - Store DB credentials in Secrets Manager
