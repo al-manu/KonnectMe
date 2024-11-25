@@ -1,81 +1,183 @@
-# variables.tf - Define all the variables required for the Terraform configuration
+# # variables.tf - Define all the variables required for the Terraform configuration
+
+# # AWS Region
+# variable "region" {
+#   description = "The AWS region where the resources will be deployed"
+#   default     = "eu-central-1"
+# }
+
+# # Redshift Serverless Configuration
+# variable "namespace_name" {
+#   description = "The name of the Redshift Serverless namespace"
+#   type        = string
+# }
+
+# variable "workgroup_name" {
+#   description = "The name of the Redshift Serverless workgroup"
+#   type        = string
+# }
+
+# variable "base_capacity" {
+#   description = "Base capacity for the Redshift workgroup"
+#   type        = number
+# }
+
+# variable "enhanced_vpc_routing" {
+#   description = "Enable enhanced VPC routing for Redshift"
+#   type        = bool
+# }
+
+# variable "log_exports" {
+#   description = "List of log exports for Redshift"
+#   type        = list(string)
+#   default     = []
+# }
+
+# variable "db_username" {
+#   description = "Database username"
+#   type        = string
+# }
+
+# variable "db_password" {
+#   description = "Database password"
+#   type        = string
+# }
+
+# variable "db_host" {
+#   description = "Redshift endpoint"
+#   type        = string
+# }
+
+# variable "db_port" {
+#   description = "Redshift port"
+#   type        = number
+#   default     = 5439
+# }
+
+# variable "db_name" {
+#   description = "Redshift database name"
+#   type        = string
+# }
+
+# # IAM Configuration
+# variable "iam_role_name" {
+#   description = "IAM role name to be used for Redshift"
+#   type        = string
+# }
+
+
+
+
+# # Secrets Manager Configuration
+# variable "secret_name" {
+#   description = "Name of the secret in Secrets Manager"
+#   type        = string
+# }
+
+# variable "secret_value" {
+#   description = "The value of the secret (password)"
+#   type        = string
+# }
+
+# variable "secret_description" {
+#   description = "Description of the secret"
+#   type        = string
+# }
+
+# # Tags for all resources
+# variable "tags" {
+#   description = "Tags to be applied to resources"
+#   type        = map(string)
+#   default     = {
+#     "Environment" = "dev"
+#     "Project"     = "KonnectMe"
+#   }
+# }
+
+
+
+# # VPC Configuration
+# variable "vpc_cidr_block" {
+#   description = "CIDR block for the VPC"
+#   type        = string
+# }
+
+# variable "private_subnet_cidrs" {
+#   description = "List of CIDR blocks for private subnets"
+#   type        = list(string)
+# }
+
+# variable "availability_zones" {
+#   description = "List of availability zones"
+#   type        = list(string)
+# }
+
+# variable "project_name" {
+#   description = "The name of the project, used for tagging"
+#   type        = string
+# }
+
+# variable "allowed_ips" {
+#   description = "The IP addresses allowed to connect to Redshift"
+#   type        = list(string)
+# }
+
+# # IAM, Redshift, and Secrets Manager related variables (continue as before)
+
+
 
 # AWS Region
 variable "region" {
-  description = "The AWS region where the resources will be deployed"
+  description = "The AWS region to deploy resources in"
+  type        = string
   default     = "eu-central-1"
 }
 
-# Redshift Serverless Configuration
-variable "namespace_name" {
-  description = "The name of the Redshift Serverless namespace"
+# VPC CIDR block
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
   type        = string
 }
 
-variable "workgroup_name" {
-  description = "The name of the Redshift Serverless workgroup"
-  type        = string
-}
-
-variable "base_capacity" {
-  description = "Base capacity for the Redshift workgroup"
-  type        = number
-}
-
-variable "enhanced_vpc_routing" {
-  description = "Enable enhanced VPC routing for Redshift"
-  type        = bool
-}
-
-variable "log_exports" {
-  description = "List of log exports for Redshift"
+# Private subnets CIDRs
+variable "private_subnet_cidrs" {
+  description = "List of CIDR blocks for private subnets"
   type        = list(string)
-  default     = []
 }
 
-variable "db_username" {
-  description = "Database username"
+# Availability zones
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+}
+
+# Tags for resources
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+}
+
+# Project name for tagging
+variable "project_name" {
+  description = "The name of the project, used for tagging"
   type        = string
 }
 
-variable "db_password" {
-  description = "Database password"
-  type        = string
+# Allowed IPs for Redshift access
+variable "allowed_ips" {
+  description = "The IP addresses allowed to connect to Redshift"
+  type        = list(string)
 }
 
-variable "db_host" {
-  description = "Redshift endpoint"
-  type        = string
-}
-
-variable "db_port" {
-  description = "Redshift port"
-  type        = number
-  default     = 5439
-}
-
-variable "db_name" {
-  description = "Redshift database name"
-  type        = string
-}
-
-# IAM Configuration
+# IAM Role name for Redshift
 variable "iam_role_name" {
-  description = "IAM role name to be used for Redshift"
+  description = "IAM role name for Redshift"
   type        = string
 }
 
-
-
-
-# Secrets Manager Configuration
+# Secrets Manager configuration for DB credentials
 variable "secret_name" {
   description = "Name of the secret in Secrets Manager"
-  type        = string
-}
-
-variable "secret_value" {
-  description = "The value of the secret (password)"
   type        = string
 }
 
@@ -84,42 +186,42 @@ variable "secret_description" {
   type        = string
 }
 
-# Tags for all resources
-variable "tags" {
-  description = "Tags to be applied to resources"
-  type        = map(string)
-  default     = {
-    "Environment" = "dev"
-    "Project"     = "KonnectMe"
-  }
-}
-
-
-
-# VPC Configuration
-variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC"
+# DB username and password for Redshift
+variable "db_username" {
+  description = "Redshift DB username"
   type        = string
 }
 
-variable "private_subnet_cidrs" {
-  description = "List of CIDR blocks for private subnets"
-  type        = list(string)
-}
-
-variable "availability_zones" {
-  description = "List of availability zones"
-  type        = list(string)
-}
-
-variable "project_name" {
-  description = "The name of the project, used for tagging"
+variable "db_password" {
+  description = "Redshift DB password"
   type        = string
 }
 
-variable "allowed_ips" {
-  description = "The IP addresses allowed to connect to Redshift"
+# Redshift workgroup and capacity
+variable "workgroup_name" {
+  description = "Redshift workgroup name"
+  type        = string
+}
+
+variable "base_capacity" {
+  description = "Base capacity for Redshift workgroup"
+  type        = number
+}
+
+# Enhanced VPC Routing for Redshift
+variable "enhanced_vpc_routing" {
+  description = "Whether to enable enhanced VPC routing"
+  type        = bool
+}
+
+# List of log exports for Redshift
+variable "log_exports" {
+  description = "List of log types to export from Redshift"
   type        = list(string)
 }
 
-# IAM, Redshift, and Secrets Manager related variables (continue as before)
+# Redshift namespace name
+variable "namespace_name" {
+  description = "Redshift namespace name"
+  type        = string
+}

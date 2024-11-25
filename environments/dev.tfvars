@@ -86,47 +86,68 @@ aws_region = "eu-central-1"  # AWS region for the DEV environment
 # dev.tfvars
 
 # IAM Role Name for Redshift
-iam_role_name = "redshift-role-for-project"  # Name of the IAM role for Redshift
+# iam_role_name = "redshift-role-for-project"  # Name of the IAM role for Redshift
 
-# Tags (You can use these tags across resources for easy identification)
-tags = {
-  Environment = "dev"
-  Project     = "redshift-migration"
-}
+# # Tags (You can use these tags across resources for easy identification)
+# tags = {
+#   Environment = "dev"
+#   Project     = "redshift-migration"
+# }
 
-# Redshift Specific Variables
-namespace_name   = "my-redshift-namespace"
-workgroup_name   = "my-redshift-workgroup"
-base_capacity    = 16  # Starting capacity units for Redshift serverless
-enhanced_vpc_routing = true  # Enable enhanced VPC routing
-log_exports      = ["userlog", "connectionlog", "useractivitylog"]  # Logs to export
-db_username      = "adminuser"  # DB Username
-db_password      = "mysecretpassword"  # DB Password, ideally stored in Secrets Manager
-db_host          = "redshift-cluster-name"  # Hostname of the Redshift cluster
-db_port          = 5439  # Port for Redshift connection
-db_name          = "mydatabase"  # Database name to create in Redshift
+# # Redshift Specific Variables
+# namespace_name   = "my-redshift-namespace"
+# workgroup_name   = "my-redshift-workgroup"
+# base_capacity    = 16  # Starting capacity units for Redshift serverless
+# enhanced_vpc_routing = true  # Enable enhanced VPC routing
+# log_exports      = ["userlog", "connectionlog", "useractivitylog"]  # Logs to export
+# db_username      = "adminuser"  # DB Username
+# db_password      = "mysecretpassword"  # DB Password, ideally stored in Secrets Manager
+# db_host          = "redshift-cluster-name"  # Hostname of the Redshift cluster
+# db_port          = 5439  # Port for Redshift connection
+# db_name          = "mydatabase"  # Database name to create in Redshift
 
-# VPC Configuration
-# vpc_cidr_block       = "10.0.0.0/16"  # CIDR block for the VPC
-# subnet_cidr_blocks   = ["10.0.1.0/24", "10.0.2.0/24"]  # Subnet CIDRs (Two subnets in different availability zones)
-# availability_zone    = "eu-central-1a"  # Availability Zone for your subnets
-# vpc_security_group_ids = ["sg-xxxxxxxx"]  # Security group for VPC (this is the Security Group ID that Redshift will use)
-region              = "eu-central-1"  # AWS region for deployment
-vpc_cidr_block      = "10.0.0.0/16"  # CIDR block for the VPC
-private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]  # Private subnets CIDRs
-availability_zones  = ["eu-central-1a", "eu-central-1b"]  # Availability zones
+# # VPC Configuration
+# # vpc_cidr_block       = "10.0.0.0/16"  # CIDR block for the VPC
+# # subnet_cidr_blocks   = ["10.0.1.0/24", "10.0.2.0/24"]  # Subnet CIDRs (Two subnets in different availability zones)
+# # availability_zone    = "eu-central-1a"  # Availability Zone for your subnets
+# # vpc_security_group_ids = ["sg-xxxxxxxx"]  # Security group for VPC (this is the Security Group ID that Redshift will use)
+# region              = "eu-central-1"  # AWS region for deployment
+# vpc_cidr_block      = "10.0.0.0/16"  # CIDR block for the VPC
+# private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]  # Private subnets CIDRs
+# availability_zones  = ["eu-central-1a", "eu-central-1b"]  # Availability zones
 
-project_name        = "redshift-project"  # Project name used for tagging
-allowed_ips         = ["192.168.1.0/24", "10.0.0.0/16"]  # IPs allowed to connect to Redshift
-
-
-
-# Secrets Manager Configuration
-secret_name    = "redshift-db-credentials"  # Name for the Secrets Manager secret
-secret_value   = "password-to-be-rotated"  # Value stored in the secret, ideally this is handled by Lambda for rotation
-secret_description = "Redshift database credentials for dev environment"  # Optional description for the secret
-
-# Lambda (Optional - If you're rotating passwords)
-lambda_function_name = "redshift-password-rotation"  # Lambda function name for rotating passwords
+# project_name        = "redshift-project"  # Project name used for tagging
+# allowed_ips         = ["192.168.1.0/24", "10.0.0.0/16"]  # IPs allowed to connect to Redshift
 
 
+
+# # Secrets Manager Configuration
+# secret_name    = "redshift-db-credentials"  # Name for the Secrets Manager secret
+# secret_value   = "password-to-be-rotated"  # Value stored in the secret, ideally this is handled by Lambda for rotation
+# secret_description = "Redshift database credentials for dev environment"  # Optional description for the secret
+
+# # Lambda (Optional - If you're rotating passwords)
+# lambda_function_name = "redshift-password-rotation"  # Lambda function name for rotating passwords
+
+
+
+
+# Set the values for the development environment
+
+region               = "eu-central-1"
+vpc_cidr            = "10.0.0.0/16"
+private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+availability_zones  = ["eu-central-1a", "eu-central-1b"]
+tags                = { "Environment" = "dev", "Project" = "redshift-project" }
+project_name        = "redshift-project"
+allowed_ips         = ["192.168.1.0/24", "10.0.0.0/16"]
+iam_role_name       = "redshift-iam-role"
+secret_name         = "redshift-db-credentials"
+secret_description  = "Redshift database credentials"
+db_username         = "admin"
+db_password         = "SuperSecurePassword123"
+workgroup_name      = "redshift-workgroup"
+base_capacity       = 2
+enhanced_vpc_routing = true
+log_exports         = ["user", "connection_log"]
+namespace_name      = "redshift-namespace"

@@ -1,19 +1,21 @@
-output "namespace_name" {
-  value       = aws_redshiftserverless_namespace.namespace.namespace_name
-  description = "The name of the Redshift namespace"
+# Outputs to share information from this module
+
+# Output the VPC ID
+output "vpc_id" {
+  value = aws_vpc.main.id
 }
 
-output "workgroup_name" {
-  value       = aws_redshiftserverless_workgroup.workgroup.workgroup_name
-  description = "The name of the Redshift workgroup"
+# Output the private subnet IDs
+output "private_subnet_ids" {
+  value = aws_subnet.private[*].id
 }
 
-output "workgroup_endpoint" {
-  value       = aws_redshiftserverless_workgroup.workgroup.endpoint.name
-  description = "The endpoint for connecting to the Redshift workgroup"
+# Output the IAM role ARN for Redshift
+output "redshift_role_arn" {
+  value = aws_iam_role.redshift_role.arn
 }
 
-output "workgroup_arn" {
-  value       = aws_redshiftserverless_workgroup.workgroup.workgroup_arn
-  description = "The ARN of the Redshift workgroup"
+# Output the Redshift endpoint (hostname) for connection
+output "redshift_endpoint" {
+  value = aws_redshiftserverless_workgroup.redshift_serverless.endpoint
 }
