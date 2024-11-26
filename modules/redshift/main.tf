@@ -173,7 +173,6 @@ resource "aws_redshiftserverless_workgroup" "redshift_workgroup" {
   enhanced_vpc_routing = true
   subnet_ids           = aws_subnet.private[*].id
   security_group_ids   = [aws_security_group.redshift.id]
-
+  depends_on = [aws_redshiftserverless_namespace.redshift_namespace]  # Ensure namespace is created first
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
 }
-
