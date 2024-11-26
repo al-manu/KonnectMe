@@ -232,7 +232,7 @@ resource "aws_lambda_function" "password_rotation" {
 
   # Add the Lambda function code
   filename = "lambda.zip"  # Assuming you've packaged the code into a ZIP file
-  source_code_hash = filebase64sha256("lambda.zip")
+  source_code_hash = filebase64sha256("${path.module}/../../scripts/lambda/lambda.zip")
 
   environment {
     variables = {
