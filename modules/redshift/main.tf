@@ -291,8 +291,3 @@ resource "aws_lambda_permission" "secrets_manager_invocation" {
   function_name = aws_lambda_function.password_rotation.function_name
   principal     = "secretsmanager.amazonaws.com"
 }
-
-resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
-  role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-}
