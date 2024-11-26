@@ -147,6 +147,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
 resource "aws_secretsmanager_secret" "db_credentials" {
   name        = var.secret_name
   description = var.secret_description
+  kms_key_id  = aws_kms_key.redshift_kms_key.id  # Use the KMS key for encryption
 
   tags = merge(var.tags, { "Name" = "${var.project_name}-secret" })
 }
@@ -181,4 +182,39 @@ resource "aws_redshiftserverless_workgroup" "redshift_workgroup" {
   # security_group_ids   = [aws_security_group.redshift.id]
   depends_on = [aws_redshiftserverless_namespace.redshift_namespace]  # Ensure namespace is created first
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
+}
+
+# resource "aws_kms_key" "redshift_kms_key" {
+#   description             = "KMS key for Redshift encryption"
+#   deletion_window_in_days = 10
+
+#   tags = {
+#     "Environment" = "dev"
+#     "Project"     = "redshift-project"
+#   }
+# }
+
+# Create a KMS Key for Secrets Manager encryption
+resource "aws_kms_key" "redshift_kms_key" {
+  description             = "KMS key for Redshift Database Credentials"
+  deletion_window_in_days = 10
+
+  tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-kms-key" })
+}
+
+# IAM Policy to allow access to the KMS Key for decryption of credentials
+resource "aws_iam_role_policy" "redshift_kms_policy" {
+  name   = "RedshiftKMSPolicy"
+  role   = aws_iam_role.redshift_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "kms:Decrypt"
+        Resource = aws_kms_key.redshift_kms_key.arn
+      }
+    ]
+  })
 }

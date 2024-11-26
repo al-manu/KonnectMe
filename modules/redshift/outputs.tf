@@ -31,3 +31,9 @@ output "redshift_namespace_name" {
   description = "The name of the Redshift Serverless namespace created for managing resources"
   value       = aws_redshiftserverless_namespace.redshift_namespace.namespace_name
 }
+
+# Output the KMS key ID for reference
+output "kms_key_id" {
+  description = "The ID of the KMS key created for Redshift encryption"
+  value       = aws_kms_key.redshift_kms_key.id
+}

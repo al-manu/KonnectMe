@@ -37,3 +37,7 @@ base_capacity      = 8
 enhanced_vpc_routing = true
 log_exports        = ["user", "connection_log"]
 namespace_name     = "redshift-namespace"
+
+
+# Optional: If you want to disable KMS encryption, set this to false
+use_kms_encryption  = true  # Default is true for KMS encryption

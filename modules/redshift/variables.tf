@@ -153,3 +153,11 @@ variable "namespace_name" {
 #   description = "ARN of the Secrets Manager secret for admin credentials"
 #   type        = string
 # }
+
+
+
+variable "use_kms_encryption" {
+  description = "Whether to use KMS encryption for Redshift"
+  type        = bool
+  default     = true  # Set it to 'true' if you want KMS encryption by default
+}
