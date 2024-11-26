@@ -185,15 +185,6 @@ resource "aws_redshiftserverless_workgroup" "redshift_workgroup" {
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
 }
 
-# resource "aws_kms_key" "redshift_kms_key" {
-#   description             = "KMS key for Redshift encryption"
-#   deletion_window_in_days = 10
-
-#   tags = {
-#     "Environment" = "dev"
-#     "Project"     = "redshift-project"
-#   }
-# }
 
 # Create a KMS Key for Secrets Manager encryption
 resource "aws_kms_key" "redshift_kms_key" {
