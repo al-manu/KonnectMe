@@ -133,6 +133,12 @@ resource "aws_iam_role_policy_attachment" "redshift_role_secret_access" {
   role       = aws_iam_role.redshift_role.name
 }
 
+# Attach the CloudWatch Logs full access policy to the Redshift IAM role
+resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
+  role       = aws_iam_role.redshift_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
 # --------------------------------------------------------
 # Secrets Manager for DB Credentials
 # --------------------------------------------------------
