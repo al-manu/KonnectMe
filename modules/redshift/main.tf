@@ -169,6 +169,7 @@ resource "aws_secretsmanager_secret_version" "db_credentials_version" {
 resource "aws_redshiftserverless_namespace" "redshift_namespace" {
   namespace_name = var.namespace_name
   log_exports    = ["userlog", "connectionlog"]
+  iam_roles      = [aws_iam_role.redshift_role.arn]
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-namespace" })
 }
 
@@ -178,8 +179,8 @@ resource "aws_redshiftserverless_workgroup" "redshift_workgroup" {
   namespace_name       = aws_redshiftserverless_namespace.redshift_namespace.namespace_name
   base_capacity        = var.base_capacity
   enhanced_vpc_routing = var.enhanced_vpc_routing
-  # subnet_ids           = aws_subnet.private[*].id
-  # security_group_ids   = [aws_security_group.redshift.id]
+  subnet_ids           = aws_subnet.private[*].id
+  security_group_ids   = [aws_security_group.redshift.id]
   depends_on = [aws_redshiftserverless_namespace.redshift_namespace]  # Ensure namespace is created first
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
 }
@@ -231,7 +232,7 @@ resource "aws_lambda_function" "password_rotation" {
   runtime = "python3.8"
 
   # Add the Lambda function code
-  filename = "lambda.zip"  # Assuming you've packaged the code into a ZIP file
+  filename = "${path.module}/scripts/lambda/lambda.zip"  # Assuming you've packaged the code into a ZIP file
   source_code_hash = filebase64sha256("${path.module}/../../scripts/lambda/lambda.zip")
 
   environment {
@@ -266,7 +267,7 @@ resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
 
 resource "aws_iam_role_policy_attachment" "lambda_redshift_policy" {
   role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/RedshiftDataFullAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRedshiftDataFullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_policy" {
@@ -281,4 +282,5 @@ resource "aws_secretsmanager_secret_rotation" "db_credentials_rotation" {
   rotation_rules {
     automatically_after_days = 1  # Rotate every 30 days
   }
+  depends_on = [aws_lambda_function.password_rotation]
 }
