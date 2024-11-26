@@ -180,7 +180,7 @@ resource "aws_redshiftserverless_workgroup" "redshift_workgroup" {
   base_capacity        = var.base_capacity
   enhanced_vpc_routing = var.enhanced_vpc_routing
   subnet_ids           = aws_subnet.private[*].id
-  security_group_ids   = [aws_security_group.redshift.id]
+  # security_group_ids   = [aws_security_group.redshift.id]
   depends_on = [aws_redshiftserverless_namespace.redshift_namespace]  # Ensure namespace is created first
   tags = merge(var.tags, { "Name" = "${var.project_name}-redshift-workgroup" })
 }
@@ -283,4 +283,16 @@ resource "aws_secretsmanager_secret_rotation" "db_credentials_rotation" {
     automatically_after_days = 1  # Rotate every 30 days
   }
   depends_on = [aws_lambda_function.password_rotation]
+}
+
+resource "aws_lambda_permission" "secrets_manager_invocation" {
+  statement_id  = "AllowSecretsManagerInvocation"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.password_rotation.function_name
+  principal     = "secretsmanager.amazonaws.com"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
