@@ -1,123 +1,155 @@
-# Define variables for all configurable parameters
+# --------------------------------------------------------
+# Variables: Configurable Parameters for Redshift Module
+# --------------------------------------------------------
+
+# ------------------------
+# AWS Configuration
+# ------------------------
 
 # AWS Region
 variable "region" {
-  description = "AWS region"
+  description = "AWS region where resources will be deployed (e.g., eu-central-1)"
   type        = string
-  default     = "eu-central-1"
+  default     = "eu-central-1" # Default region set to Europe (Central)
 }
 
+# ------------------------
 # VPC Configuration
+# ------------------------
+
+# CIDR Block for the VPC
 variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
+  description = "CIDR block for the VPC (e.g., 10.0.0.0/16)"
   type        = string
 }
 
-# Private Subnets Configuration
+# CIDR Blocks for Private Subnets
 variable "private_subnet_cidrs" {
-  description = "List of CIDR blocks for private subnets"
+  description = "List of CIDR blocks for private subnets (e.g., [10.0.1.0/24, 10.0.2.0/24])"
   type        = list(string)
 }
 
-# Availability Zones Configuration
+# Availability Zones for Subnets
 variable "availability_zones" {
-  description = "List of availability zones"
+  description = "List of availability zones for the private subnets"
   type        = list(string)
 }
+
+# ------------------------
+# Tagging Configuration
+# ------------------------
 
 # General Tags for Resources
 variable "tags" {
-  description = "Tags to apply to resources"
+  description = "Tags to apply to all resources (e.g., {Environment = 'Dev', Team = 'Data'})"
   type        = map(string)
 }
 
 # Project Name for Tagging
 variable "project_name" {
-  description = "The name of the project, used for tagging"
+  description = "Project name for tagging resources (e.g., redshift-project)"
   type        = string
 }
+
+# ------------------------
+# Security and Access
+# ------------------------
 
 # Allowed IPs for Redshift Access
 variable "allowed_ips" {
-  description = "The IP addresses allowed to connect to Redshift"
+  description = "IP addresses or ranges allowed to connect to Redshift (e.g., [203.0.113.0/24])"
   type        = list(string)
 }
 
-# IAM Role Configuration for Redshift
+# IAM Role Name for Redshift
 variable "iam_role_name" {
-  description = "IAM role name for Redshift"
+  description = "Name of the IAM role assigned to Redshift for accessing AWS services"
   type        = string
 }
 
+# ------------------------
 # Secrets Manager Configuration
+# ------------------------
+
+# Secret Name for Redshift Credentials
 variable "secret_name" {
-  description = "Name of the secret in Secrets Manager"
+  description = "Name of the secret in Secrets Manager for Redshift credentials"
   type        = string
 }
 
+# Secret Description for Documentation
 variable "secret_description" {
-  description = "Description of the secret"
+  description = "Description of the secret stored in Secrets Manager"
   type        = string
 }
+
+# ------------------------
+# Redshift Configuration
+# ------------------------
 
 # Redshift DB Credentials
 variable "db_username" {
-  description = "Redshift DB username"
+  description = "Admin username for Redshift database"
   type        = string
 }
 
 variable "db_password" {
-  description = "Redshift DB password"
+  description = "Admin password for Redshift database"
   type        = string
 }
 
-# Redshift Workgroup and Capacity
+# Redshift Workgroup Settings
 variable "workgroup_name" {
-  description = "Redshift workgroup name"
+  description = "Name of the Redshift Serverless workgroup"
   type        = string
 }
 
 variable "base_capacity" {
-  description = "Redshift workgroup base capacity"
+  description = "Compute capacity (in RPU) for the Redshift workgroup"
   type        = number
 }
 
-# Enhanced VPC Routing Setting
+# Enhanced VPC Routing
 variable "enhanced_vpc_routing" {
-  description = "Whether to enable enhanced VPC routing"
+  description = "Enable enhanced VPC routing for Redshift Serverless (true/false)"
   type        = bool
 }
 
-# Redshift Logs Configuration
+# Redshift Log Exports
 variable "log_exports" {
-  description = "List of log types to export from Redshift"
+  description = "List of log types to export from Redshift (e.g., [userlog, connectionlog])"
   type        = list(string)
 }
 
-# Redshift Namespace Name
+# Redshift Namespace
 variable "namespace_name" {
-  description = "Redshift namespace name"
+  description = "Name of the Redshift Serverless namespace"
   type        = string
 }
 
-# Namespace and Workgroup for Redshift Serverless
+# ------------------------
+# Deprecated or Optional Variables
+# ------------------------
 
+# Namespace Admin Credentials (Optional - Using Secrets Manager)
 # variable "admin_username" {
-#   description = "Admin username for the Redshift Serverless namespace"
+#   description = "Admin username for the Redshift namespace (if not using Secrets Manager)"
 #   type        = string
 # }
-
+#
 # variable "admin_password" {
-#   description = "Admin password for the Redshift Serverless namespace"
+#   description = "Admin password for the Redshift namespace (if not using Secrets Manager)"
 #   type        = string
 # }
 
+# Security Group ID (Deprecated - Now Dynamically Created)
 # variable "vpc_security_group_id" {
-#   description = "The security group ID for the Redshift Serverless workgroup"
+#   description = "Security group ID for the Redshift workgroup"
 #   type        = string
 # }
 
+# Secrets Manager Secret ARN (Optional - Dynamically Referenced)
 # variable "secret_arn" {
-#   description = "The ARN of the Secrets Manager secret containing the admin password"
+#   description = "ARN of the Secrets Manager secret for admin credentials"
 #   type        = string
 # }
