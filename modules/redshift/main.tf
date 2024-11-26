@@ -219,7 +219,7 @@ resource "aws_lambda_function" "password_rotation" {
   function_name = "redshift-password-rotation"
 
   role    = aws_iam_role.lambda_execution_role.arn
-  handler = "lambda_function.lambda_handler"
+  handler = "lambda_rotation.lambda_handler"
   runtime = "python3.8"
 
   # Add the Lambda function code
