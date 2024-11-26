@@ -23,7 +23,7 @@ output "redshift_role_arn" {
 # Output the Redshift Endpoint (Hostname)
 output "redshift_endpoint" {
   description = "The endpoint (hostname) of the Redshift Serverless workgroup for client connection"
-  value       = aws_redshiftserverless_workgroup.redshift_serverless.endpoint
+  value       = aws_redshiftserverless_workgroup.redshift_workgroup.endpoint
 }
 
 # Output the Redshift Namespace Name
