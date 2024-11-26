@@ -218,3 +218,67 @@ resource "aws_iam_role_policy" "redshift_kms_policy" {
     ]
   })
 }
+
+
+
+
+
+resource "aws_lambda_function" "password_rotation" {
+  function_name = "redshift-password-rotation"
+
+  role    = aws_iam_role.lambda_execution_role.arn
+  handler = "index.lambda_handler"
+  runtime = "python3.8"
+
+  # Add the Lambda function code
+  filename = "lambda.zip"  # Assuming you've packaged the code into a ZIP file
+  source_code_hash = filebase64sha256("lambda.zip")
+
+  environment {
+    variables = {
+      SECRET_ID = aws_secretsmanager_secret.db_credentials.id
+    }
+  }
+}
+
+resource "aws_iam_role" "lambda_execution_role" {
+  name = "lambda-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action    = "sts:AssumeRole",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Effect    = "Allow",
+        Sid       = ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_secrets_manager_policy" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_redshift_policy" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/RedshiftDataFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_policy" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+
+resource "aws_secretsmanager_secret_rotation" "db_credentials_rotation" {
+  secret_id = aws_secretsmanager_secret.db_credentials.id
+  rotation_lambda_arn = aws_lambda_function.password_rotation.arn
+  rotation_rules {
+    automatically_after_days = 1  # Rotate every 30 days
+  }
+}
