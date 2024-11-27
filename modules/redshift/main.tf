@@ -3,9 +3,9 @@
 # # --------------------------------------------------------
 
 # # Configure AWS provider to use the specified region
-# provider "aws" {
-#   region = var.region  # Set the AWS region from the input variables
-# }
+provider "aws" {
+  region = var.region  # Set the AWS region from the input variables
+}
 
 # # --------------------------------------------------------
 # # VPC and Networking Setup
