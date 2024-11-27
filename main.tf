@@ -2,11 +2,11 @@
 # # Root Module Configuration
 # # ----------------------------------------
 
-# # AWS Provider Configuration
-# # Configures the AWS provider to use the region defined in the variables.
-# provider "aws" {
-#   region = var.region
-# }
+# AWS Provider Configuration
+# Configures the AWS provider to use the region defined in the variables.
+provider "aws" {
+  region = var.region
+}
 
 # # ----------------------------------------
 # # Redshift Module - Serverless Cluster Configuration
