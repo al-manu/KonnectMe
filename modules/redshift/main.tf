@@ -284,3 +284,24 @@ resource "aws_lambda_permission" "secrets_manager_invocation" {
 }
 
 
+resource "aws_iam_role_policy" "lambda_kms_policy" {
+  name   = "lambda-kms-policy"
+  role   = aws_iam_role.lambda_execution_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Action    = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:ReEncrypt*"
+        ],
+        Resource  = aws_kms_key.redshift_kms_key.arn # Replace with your KMS key ARN
+      }
+    ]
+  })
+}
+
