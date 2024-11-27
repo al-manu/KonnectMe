@@ -282,3 +282,5 @@ resource "aws_lambda_permission" "secrets_manager_invocation" {
   function_name = aws_lambda_function.password_rotation.function_name
   principal     = "secretsmanager.amazonaws.com"
 }
+
+
