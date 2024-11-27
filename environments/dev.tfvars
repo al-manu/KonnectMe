@@ -17,6 +17,7 @@ tags = {
   "Environment" = "dev"
   "Project"     = "redshift-project"
 }
+
 project_name = "redshift-project"
 
 # ----------------------------------------
@@ -38,6 +39,7 @@ enhanced_vpc_routing = true
 log_exports        = ["user", "connection_log"]
 namespace_name     = "redshift-namespace"
 
-
-# Optional: If you want to disable KMS encryption, set this to false
+# ----------------------------------------
+# Encryption Configuration
+# ----------------------------------------
 use_kms_encryption  = true  # Default is true for KMS encryption
