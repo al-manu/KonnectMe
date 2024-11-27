@@ -13,8 +13,8 @@ provider "aws" {
 # # ----------------------------------------
 
 # # This module provisions a Redshift Serverless cluster with networking, IAM, and security configurations.
-# module "redshift" {
-#   source = "./modules/redshift"
+module "redshift" {
+  source = "./modules/redshift"
 
 #   # ------------------------
 #   # General Configuration
@@ -86,4 +86,4 @@ provider "aws" {
 
 #   # Project name for tagging resources and tracking costs.
 #   project_name         = var.project_name
-# }
+}
