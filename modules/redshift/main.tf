@@ -305,3 +305,25 @@ resource "aws_iam_role_policy" "lambda_kms_policy" {
   })
 }
 
+# Add an inline policy for Redshift Serverless permissions to the Lambda role
+resource "aws_iam_role_policy" "lambda_redshift_serverless_policy" {
+  name = "lambda-redshift-serverless-policy"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Action    = [
+          "redshift-serverless:ListNamespaces",
+          "redshift-serverless:GetNamespace",
+          "redshift-serverless:ListWorkgroups",
+          "redshift-serverless:GetWorkgroup",
+          "redshift-serverless:DescribeEndpoints"
+        ],
+        Resource  = "*"
+      }
+    ]
+  })
+}
