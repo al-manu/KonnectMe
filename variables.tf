@@ -2,12 +2,12 @@
 # # AWS Region and Network Configuration
 # # ----------------------------------------
 
-# # AWS Region where resources will be deployed
-# variable "region" {
-#   description = "The AWS region to deploy resources in"
-#   type        = string
-#   default     = "eu-central-1"  # Default region set to Europe (Central)
-# }
+# AWS Region where resources will be deployed
+variable "region" {
+  description = "The AWS region to deploy resources in"
+  type        = string
+  default     = "eu-central-1"  # Default region set to Europe (Central)
+}
 
 # # CIDR block for the Virtual Private Cloud (VPC)
 # variable "vpc_cidr" {
