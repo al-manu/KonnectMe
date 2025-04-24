@@ -1,0 +1,173 @@
+Terraform AWS Infrastructure 
+
+ 
+
+We have a GitHub repository that manages AWS infrastructure for multiple environments (dev, sit, prod) using Terraform, following Infrastructure as Code (IaC) best practices. It features a modular design, environment-specific configurations, and automated provisioning of resources like VPC, S3, Lambda, Step Functions, and Secrets Manager. Terraform backend is used for secure state management. The deployment workflow ensures safe and efficient updates across environments through version control and automation. 
+
+Components 
+
+ 
+
+Glue Job 
+
+The Glue job is responsible for extracting data from Amazon S3 bucket. This job leverages AWS Glue's managed ETL capabilities to connect to the s3 bucket, ingest and transform data and store it in a designated S3 bucket in a specified format (e.g., Parquet). 
+
+Step Functions 
+
+AWS Step Functions coordinate the various steps of the data pipeline, orchestrating the workflow from data extraction to loading into Redshift Serverless. The state machine defined within Step Functions calls the Glue job, triggers necessary AWS Lambda functions for additional data processing, and oversees the data loading into Redshift Serverless. 
+
+Redshift Module 
+
+The Redshift Module is designed for transforming and loading the ingested data into Redshift Serverless. This module contains SQL scripts that define the schema in the Redshift Serverless database, perform necessary data transformations, and load the transformed data into the appropriate tables. It’s crucial to understand the data model and transformation logic encapsulated within this module to effectively query the data in Redshift Serverless. 
+
+Lambda Functions 
+
+This repository includes Python-based AWS Lambda functions to perform specific tasks within the data pipeline, such as data validation, notification, or any other custom logic required. Each function is documented with comments explaining the purpose, inputs, outputs, and behavior of the function. 
+
+ 
+
+ 
+
+Secrets Manager 
+
+AWS Secrets Manager helps to securely store and manage sensitive information like API keys, database credentials, and application secrets. By using Secrets Manager, sensitive data is encrypted and managed centrally, reducing the risk of exposing secrets in code . 
+
+ 
+
+ 
+
+ 
+
+Project Structure 
+
+This project organizes Terraform configurations by environment, using modularized code for AWS resources. 
+
+ 
+
+Directory 
+
+Purpose 
+
+Key Components 
+
+/.github/workflows  
+
+CI/CD 
+
+8 Github Actions YAML files dor deployment /security 
+
+/bootstrap/state_setup 
+
+Terraform backend 
+
+Backend initialization (S3 state/lock) 
+
+/environments 
+
+Configuration 
+
+3 environment variables files (dev.tfvars , sit.tfvars , prod.tfvars) 
+
+/modules 
+
+Terraform 
+
+7 reusable modules (Redshift , Lambda, Step Functions ...) 
+
+/scripts 
+
+Scripts 
+
+34 Glue/Lambda scripts+SQL procedures 
+
+ 
+
+Prerequisites 
+
+Terraform: Version 1.9.8 or later. 
+
+AWS IAM Roles: Ensure AWS roles (OIDC assume Role) are set up for each environment (dev, sit, prod) with appropriate permissions. 
+
+GitHub Secrets: Store AWS role ARNs, Terraform state, and region in GitHub Secrets for secure access. 
+
+ 
+
+Environments Deployment 
+
+ 
+
+Development Environment 
+
+Trigger: Automatically runs on push to a feature branch. 
+
+Purpose: Provisions or updates resources in the Dev environment based on code changes. 
+
+ 
+
+SIT and Prod Environments 
+
+Trigger: Manually triggered via GitHub Actions using workflow dispatch. 
+
+Purpose: Provides controlled deployments to SIT and Prod, requiring approvals and monitoring. 
+
+Approval Workflow: SIT and Prod require manual approval(PR approval by other developer) before applying infrastructure changes. 
+
+ 
+
+Deployment Process 
+
+Developers push changes to a feature branch, triggering automatic Dev deployment. 
+
+Once validated, PR request needs to be created and SIT deployment is manually triggered and requires approval. 
+
+After SIT validation, Prod deployment is manually triggered and approved. 
+
+ 
+
+ 
+
+GitHub Actions Workflows 
+
+Each environment has a dedicated GitHub Actions workflow for deployment: 
+
+dev (deploy-dev.yml): Runs automatically on pushes to feature branches. 
+
+sit (deploy-sit.yml): Manually triggered after code is pushed to a feature branch and requires approval for deployment. 
+
+prod (deploy-prod.yml): Manually triggered after SIT changes are merged into main and approved. 
+
+destroy-environment (destroy-environment.yml): Allows destruction of environments when necessary. 
+
+ 
+
+Infrastructure Components 
+
+The repository provisions various AWS services through Terraform modules, including: 
+
+S3: Provides storage for logs, artifacts, and Terraform state. 
+
+Lambda: Deploys serverless functions for event-driven processing. 
+
+Step Functions: Orchestrates workflows using AWS Step Functions. 
+
+Secrets Manager: Stores and manages sensitive information securely. 
+
+Glue: Configures AWS Glue jobs for ETL processes. 
+
+Redshift: Provisions Amazon Redshift for data warehousing needs along its vpc and security groups and other related services. 
+
+SES: Simple email service is used for transactional email notifications (pipelines failures /success) 
+
+ 
+
+Important Notes 
+
+Automatic Approvals: terraform apply -auto-approve is enabled in the Dev environment for rapid iteration. 
+
+Manual Triggers: SIT and Prod deployments require manual approval for controlled releases. 
+
+State Locking: To prevent race conditions in Terraform state. 
+
+Security: Secrets and sensitive configurations are managed using AWS Secrets Manager and GitHub Secrets. 
+
+ 
