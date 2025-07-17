@@ -1,0 +1,16 @@
+Intro :
+
+
+This technical documentation introduces the KDWH Deployment Framework Version 2, a cloud-native solution developed to modernize our data warehousing platform through automated AWS provisioning and infrastructure-as-code (IaC) principles. As a replacement for our legacy Informatica-based system, KDWH v2 reflects a strategic shift toward scalable, maintainable, and secure cloud architecture.
+
+Driven by the need for improved efficiency, flexibility, and governance, this new framework leverages AWS-native services to automate deployment processes, enable dynamic scaling, and enhance security controls. Key components include Terraform for codified infrastructure, GitHub Actions for CI/CD orchestration, and AWS Step Functions for workflow coordination.
+
+The solution incorporates serverless compute (Lambda, Glue), lifecycle automation from ingestion to analytics (S3 → Glue → Redshift), and integrated governance tools such as Trivy and Secrets Manager. All infrastructure is managed through version-controlled Terraform modules, supporting consistent and repeatable deployments across Dev, SIT, and Prod environments.
+
+By adopting KDWH v2, teams benefit from standardized deployment patterns, reduced manual effort, and accelerated delivery — transforming our data warehouse into a more responsive, cost-effective analytics platform.
+
+
+
+__________________________
+
+
