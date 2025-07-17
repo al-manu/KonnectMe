@@ -1,0 +1,193 @@
+Terraform AWS Infrastructure Documentation
+Knowledge Data Warehouse (KDWH) Deployment
+
+1. Introduction
+This repository manages AWS infrastructure for multi-environment deployments (dev, sit, prod) using Terraform, adhering to Infrastructure-as-Code (IaC) principles. Key features include:
+
+Modular design for reusable components (Redshift, Lambda, Glue)
+
+Environment-specific configurations
+
+Automated provisioning of resources (VPC, S3, Step Functions, Secrets Manager)
+
+Secure state management via Terraform backend
+
+2. Core Components
+2.1 AWS Glue
+Function: Extracts, transforms, and loads (ETL) data from S3 buckets.
+
+Features:
+
+Converts raw data to Parquet format
+
+Integrates with AWS Data Catalog
+
+Managed job bookmarks for incremental processing
+
+2.2 AWS Step Functions
+Role: Orchestrates data pipeline workflows.
+
+Workflow Steps:
+
+Trigger Glue jobs for data ingestion
+
+Invoke Lambda functions for validation/transformation
+
+Load processed data into Redshift Serverless
+
+2.3 Redshift Serverless Module
+Components:
+
+Schema definitions (DDL scripts)
+
+Data transformation logic (SQL)
+
+Secure access via IAM authentication
+
+Key Files:
+
+redshift/main.tf: Cluster configuration
+
+redshift/secret.tf: Credential management
+
+2.4 AWS Lambda Functions
+Functions:
+
+kdwh-etl-load.py: Data validation and batch processing
+
+kdwh-redshift-password-rotation.py: Secret rotation automation
+
+kdwh-send-email.py: SES-based notifications
+
+Design:
+
+Python 3.12 runtime
+
+Environment-specific variables via Terraform
+
+2.5 AWS Secrets Manager
+Managed Secrets:
+
+Redshift database credentials
+
+API keys for third-party services
+
+SES SMTP credentials
+
+Security:
+
+Automatic 90-day rotation
+
+KMS encryption at rest
+
+3. Project Structure
+Directory	Purpose	Key Contents
+/.github/workflows	CI/CD pipelines	deploy-dev.yml, trivy-check.yml
+/bootstrap/state_setup	Terraform state backend	S3 bucket + DynamoDB lock configuration
+/environments	Environment variables	dev.tfvars, sit.tfvars, prod.tfvars
+/modules	Reusable Terraform modules	Redshift, Lambda, S3, SES
+/scripts	Data processing logic	34 Glue/Lambda scripts, 4 SQL procedures
+4. Prerequisites
+4.1 Tools
+Terraform: ≥ v1.9.8
+
+AWS CLI: ≥ v2.15.0
+
+GitHub Actions: OIDC configured
+
+4.2 AWS Configuration
+Resource	Requirement
+IAM Roles	OIDC assume-role for GitHub Actions
+S3 Backend	Pre-provisioned bucket for Terraform state
+Secrets Manager	Preconfigured KMS key for encryption
+5. Deployment Process
+5.1 Environment Promotion
+Development (Dev):
+
+Trigger: Push to feature branch
+
+Auto-approval: terraform apply -auto-approve
+
+System Integration Testing (SIT):
+
+Trigger: Manual via GitHub Actions
+
+Approval: 1 code reviewer required
+
+Production (Prod):
+
+Trigger: Merge to main branch
+
+Approval: 2 senior engineers
+
+5.2 Workflow Diagram
+Diagram
+Code
+
+
+
+
+
+
+
+
+6. GitHub Actions Workflows
+6.1 Key Workflows
+Workflow File	Trigger	Purpose
+deploy-dev.yml	Push to feature branch	Auto-deploys Dev environment
+deploy-sit.yml	Manual dispatch	Controlled SIT deployment
+deploy-prod.yml	Merge to main	Production release with approvals
+destroy-environment.yml	Manual dispatch	Safely destroys resources
+6.2 Security Checks
+Trivy Scan: Vulnerability scanning for Terraform code
+
+Branch Protection:
+
+Require PR approvals for main branch
+
+Enforce signed commits
+
+7. Infrastructure Details
+7.1 Key AWS Services
+Service	Use Case	Terraform Module
+S3	Data lake storage, Terraform state	modules/s3
+Lambda	Serverless data processing	modules/lambda
+SES	Pipeline failure notifications	modules/ses
+VPC	Redshift network isolation	modules/redshift/vpc
+7.2 Security Implementation
+State Locking: DynamoDB table for Terraform state consistency
+
+Network Security:
+
+Redshift in private subnets
+
+Security groups with least-privilege rules
+
+Secrets Management:
+
+Never stored in version control
+
+Accessed via data.aws_secretsmanager_secret_version
+
+8. Maintenance & Best Practices
+8.1 Routine Checks
+Monthly:
+
+Review Terraform state for drift
+
+Rotate Secrets Manager credentials
+
+Quarterly:
+
+Audit IAM policies (modules/*/iam.tf)
+
+Update Terraform/AWS provider versions
+
+8.2 Disaster Recovery
+State Recovery:
+
+bash
+terraform init -reconfigure -backend-config="bucket=kdwh-tf-backup"
+Redshift Backups: Daily automated snapshots
+
+Secrets Recovery: Use version staging in Secrets Manager
